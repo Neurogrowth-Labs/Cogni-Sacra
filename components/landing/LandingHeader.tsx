@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
 import MenuIcon from '../icons/MenuIcon';
@@ -47,7 +48,7 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
                 <div className="flex justify-between items-center h-16">
                     <div className="flex-shrink-0 flex items-center space-x-2 cursor-pointer" onClick={() => setView('home')}>
                         <CogniSacraLogo className="w-8 h-8" />
-                        <span className="font-bold text-xl font-serif">Cogni-Sacra</span>
+                        <span className="font-bold text-xl font-serif">EmpowerAfriq Academy</span>
                     </div>
                     <div className="hidden md:flex md:items-center md:space-x-4">
                         {navItems.map(item => (

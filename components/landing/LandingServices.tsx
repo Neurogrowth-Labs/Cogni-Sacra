@@ -1,3 +1,4 @@
+
 import React from 'react';
 import SparklesIcon from '../icons/SparklesIcon';
 import BriefcaseIcon from '../icons/BriefcaseIcon';
@@ -25,7 +26,7 @@ const LandingServices: React.FC = () => {
                             Solutions for Every Learner & Educator
                         </h1>
                         <p className="mt-4 max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-400">
-                            Cogni-Sacra offers a suite of powerful tools and features tailored to the unique needs of individuals, instructors, and large institutions.
+                            EmpowerAfriq Academy offers a suite of powerful tools and features tailored to the unique needs of individuals, instructors, and large institutions.
                         </p>
                     </div>
 

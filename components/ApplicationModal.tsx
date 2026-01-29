@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Job, UserProfile } from '../types';
 import BriefcaseIcon from './icons/BriefcaseIcon';
@@ -113,7 +114,7 @@ const ApplicationModal: React.FC<ApplicationModalProps> = ({ isOpen, onClose, jo
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Submitting</p>
-                            <p className="font-semibold text-gray-900 dark:text-white">Your Cogni-Sacra Profile & Certificates</p>
+                            <p className="font-semibold text-gray-900 dark:text-white">Your EmpowerAfriq Academy Profile & Certificates</p>
                         </div>
                     </div>
                      <div>

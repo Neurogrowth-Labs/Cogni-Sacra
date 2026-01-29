@@ -29,7 +29,7 @@ const NotesPanel: React.FC<{ lesson: Lesson }> = ({ lesson }) => {
 
     useEffect(() => {
         try {
-            const savedNotes = localStorage.getItem(`cogni-sacra-notes-${lesson.id}`);
+            const savedNotes = localStorage.getItem(`empower-afriq-notes-${lesson.id}`);
             if (savedNotes) {
                 setNotes(savedNotes);
             } else {
@@ -43,7 +43,7 @@ const NotesPanel: React.FC<{ lesson: Lesson }> = ({ lesson }) => {
     useEffect(() => {
         const handler = setTimeout(() => {
             try {
-                localStorage.setItem(`cogni-sacra-notes-${lesson.id}`, notes);
+                localStorage.setItem(`empower-afriq-notes-${lesson.id}`, notes);
             } catch (error) {
                 console.error("Failed to save notes to localStorage", error);
             }
@@ -272,7 +272,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
         setDiscussionPosts(newPosts);
         try {
             // This triggers the 'storage' event in other tabs, enabling real-time updates.
-            localStorage.setItem(`cogni-sacra-discussion-${lesson.id}`, JSON.stringify(newPosts));
+            localStorage.setItem(`empower-afriq-discussion-${lesson.id}`, JSON.stringify(newPosts));
         } catch (e) {
             console.error("Failed to save discussion to localStorage", e);
         }
@@ -285,7 +285,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
     const hasPassed = isQuizFinished && userScorePercentage >= passingScorePercentage;
 
     useEffect(() => {
-        const discussionKey = `cogni-sacra-discussion-${lesson.id}`;
+        const discussionKey = `empower-afriq-discussion-${lesson.id}`;
         try {
             const savedDiscussions = localStorage.getItem(discussionKey);
             setDiscussionPosts(savedDiscussions ? JSON.parse(savedDiscussions) : lesson.discussion || []);
@@ -303,14 +303,14 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
     // Load/Save Annotations
     useEffect(() => {
         try {
-            const saved = localStorage.getItem(`cogni-sacra-annotations-${lesson.id}`);
+            const saved = localStorage.getItem(`empower-afriq-annotations-${lesson.id}`);
             setAnnotations(saved ? JSON.parse(saved) : []);
         } catch (e) { setAnnotations([]); }
     }, [lesson.id]);
 
     useEffect(() => {
         try {
-            localStorage.setItem(`cogni-sacra-annotations-${lesson.id}`, JSON.stringify(annotations));
+            localStorage.setItem(`empower-afriq-annotations-${lesson.id}`, JSON.stringify(annotations));
         } catch(e) { console.error("Failed to save annotations", e); }
     }, [annotations, lesson.id]);
 

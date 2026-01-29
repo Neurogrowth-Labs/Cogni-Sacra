@@ -1,5 +1,4 @@
 
-
 // FIX: Add missing imports for Modality and GenerateContentResponse
 import { GoogleGenAI, Chat, Type, Modality, GenerateContentResponse } from "@google/genai";
 
@@ -21,7 +20,7 @@ export const startTutorChat = (): Chat => {
   tutorChat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: 'You are Cogni-Sacra AI, a friendly and expert educational tutor. Your goal is to help users understand complex topics by providing clear, concise explanations, step-by-step examples, and encouraging feedback. Always be patient and supportive. Break down difficult concepts into smaller, easy-to-digest parts. Ask clarifying questions to better understand the user\'s needs.',
+      systemInstruction: 'You are EmpowerAfriq AI, a friendly and expert educational tutor. Your goal is to help users understand complex topics by providing clear, concise explanations, step-by-step examples, and encouraging feedback. Always be patient and supportive. Break down difficult concepts into smaller, easy-to-digest parts. Ask clarifying questions to better understand the user\'s needs.',
     },
   });
   return tutorChat;
@@ -34,7 +33,7 @@ export const startArchitectChat = (): Chat => {
   architectChat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-        systemInstruction: `You are the AI Architect for the Cogni-Sacra platform, a specialized AI assistant for course instructors. Your primary function is to provide expert, data-driven coaching to help them create world-class courses.
+        systemInstruction: `You are the AI Architect for the EmpowerAfriq Academy platform, a specialized AI assistant for course instructors. Your primary function is to provide expert, data-driven coaching to help them create world-class courses.
 
         You have access to simulated platform analytics data. When an instructor asks for help, you MUST use this data to inform your suggestions. Frame your responses as an expert instructional designer. Be encouraging and strategic.
 

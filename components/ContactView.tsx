@@ -1,3 +1,4 @@
+
 import React from 'react';
 import EnvelopeIcon from './icons/EnvelopeIcon';
 import PhoneIcon from './icons/PhoneIcon';
@@ -37,14 +38,14 @@ const ContactView: React.FC = () => {
                         <EnvelopeIcon className="w-6 h-6 mr-4 text-crimson flex-shrink-0" />
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">General Inquiries</h3>
-                            <a href="mailto:support@cogni-sacra.edu" className="text-blue-600 dark:text-blue-400 hover:underline">support@cogni-sacra.edu</a>
+                            <a href="mailto:support@empowerafriq.edu" className="text-blue-600 dark:text-blue-400 hover:underline">support@empowerafriq.edu</a>
                         </div>
                     </div>
                     <div className="flex items-start">
                         <EnvelopeIcon className="w-6 h-6 mr-4 text-crimson flex-shrink-0" />
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Admissions</h3>
-                            <a href="mailto:admissions@cogni-sacra.edu" className="text-blue-600 dark:text-blue-400 hover:underline">admissions@cogni-sacra.edu</a>
+                            <a href="mailto:admissions@empowerafriq.edu" className="text-blue-600 dark:text-blue-400 hover:underline">admissions@empowerafriq.edu</a>
                         </div>
                     </div>
                     <div className="flex items-start">

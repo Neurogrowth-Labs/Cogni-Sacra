@@ -235,7 +235,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
             <div className={`flex items-center h-20 px-6 justify-between flex-shrink-0`}>
                 <div className={`flex items-center space-x-3 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
                     <CogniSacraLogo className="w-9 h-9" />
-                    <span className="font-bold text-xl text-gray-900 dark:text-white font-serif tracking-tight">Cogni</span>
+                    <span className="font-bold text-lg text-gray-900 dark:text-white font-serif tracking-tight whitespace-nowrap">EmpowerAfriq</span>
                 </div>
                 {/* Logo fallback for collapsed state */}
                 {!isOpen && (

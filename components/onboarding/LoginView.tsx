@@ -81,13 +81,13 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
 
         if (activeTab === 'signin' && rememberMe) {
             try {
-                localStorage.setItem('cogniSacraRememberMe', 'true');
+                localStorage.setItem('empowerAfriqRememberMe', 'true');
             } catch (error) {
                 console.warn("Could not save 'Remember Me' preference.");
             }
         } else {
             try {
-                localStorage.removeItem('cogniSacraRememberMe');
+                localStorage.removeItem('empowerAfriqRememberMe');
             } catch (error) {
                 console.warn("Could not clear 'Remember Me' preference.");
             }
@@ -109,7 +109,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                             <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                                 <CogniSacraLogo className="w-8 h-8" />
                             </div>
-                            <span className="text-2xl font-bold text-white font-serif tracking-tight">Cogni-Sacra</span>
+                            <span className="text-2xl font-bold text-white font-serif tracking-tight">EmpowerAfriq Academy</span>
                         </div>
                     </div>
 

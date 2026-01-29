@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { teamMembers } from '../../constants';
 
@@ -19,7 +20,7 @@ const LandingAbout: React.FC = () => {
                         Our Mission is to Make Quality Education Accessible to All
                     </h1>
                     <p className="mt-6 text-lg text-gray-600 dark:text-gray-400">
-                        Cogni-Sacra is a next-generation online education platform dedicated to delivering world-class digital learning experiences. We believe that education should be accessible, engaging, and personalized for everyone, everywhere.
+                        EmpowerAfriq Academy is a next-generation online education platform dedicated to delivering world-class digital learning experiences. We believe that education should be accessible, engaging, and personalized for everyone, everywhere.
                     </p>
                 </div>
             </section>
@@ -32,7 +33,7 @@ const LandingAbout: React.FC = () => {
                     </div>
                      <div className="mt-12 max-w-3xl mx-auto">
                         <p className="text-lg text-gray-600 dark:text-gray-400 text-center">
-                            Founded in 2024 by a team of passionate educators and technologists, Cogni-Sacra was born from a simple idea: learning should adapt to the individual, not the other way around. We saw the potential of AI to create truly personalized educational experiences and set out to build a platform that empowers both learners and instructors. From a small prototype to a global community, our focus has always been on harnessing technology to unlock human potential.
+                            Founded in 2024 by a team of passionate educators and technologists, EmpowerAfriq Academy was born from a simple idea: learning should adapt to the individual, not the other way around. We saw the potential of AI to create truly personalized educational experiences and set out to build a platform that empowers both learners and instructors. From a small prototype to a global community, our focus has always been on harnessing technology to unlock human potential.
                         </p>
                     </div>
                  </div>
@@ -44,7 +45,7 @@ const LandingAbout: React.FC = () => {
                     <div className="text-center">
                         <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-white font-serif">Meet the Team</h2>
                         <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
-                            The passionate minds behind Cogni-Sacra, dedicated to revolutionizing education.
+                            The passionate minds behind EmpowerAfriq Academy, dedicated to revolutionizing education.
                         </p>
                     </div>
                     <div className="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-4">

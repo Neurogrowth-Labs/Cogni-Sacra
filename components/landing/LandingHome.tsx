@@ -276,7 +276,7 @@ const LandingHome: React.FC<LandingHomeProps> = ({ onGetStarted }) => {
                         <span className="block">Ready to start your learning journey?</span>
                     </h2>
                     <p className="mt-4 text-lg leading-6 text-gray-600 dark:text-gray-400">
-                        Join Cogni-Sacra today and gain access to a world of knowledge.
+                        Join EmpowerAfriq Academy today and gain access to a world of knowledge.
                     </p>
                     <button
                         onClick={onGetStarted}

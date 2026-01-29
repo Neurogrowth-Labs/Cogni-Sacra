@@ -1,3 +1,4 @@
+
 import React from 'react';
 import LinkedInIcon from '../icons/LinkedInIcon';
 import GitHubIcon from '../icons/GitHubIcon';
@@ -24,7 +25,7 @@ const LandingFooter: React.FC<LandingFooterProps> = ({ setView }) => {
                     <div className="space-y-8 xl:col-span-1">
                         <div className="flex items-center space-x-2">
                              <CogniSacraLogo className="w-10 h-10" />
-                            <span className="font-bold text-xl font-serif">Cogni-Sacra</span>
+                            <span className="font-bold text-xl font-serif">EmpowerAfriq Academy</span>
                         </div>
                         <p className="text-gray-500 dark:text-gray-400 text-base">
                             Learn Without Limits.
@@ -64,7 +65,7 @@ const LandingFooter: React.FC<LandingFooterProps> = ({ setView }) => {
                     </div>
                 </div>
                 <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
-                    <p className="text-base text-gray-400 xl:text-center">&copy; {new Date().getFullYear()} Cogni-Sacra. All rights reserved.</p>
+                    <p className="text-base text-gray-400 xl:text-center">&copy; {new Date().getFullYear()} EmpowerAfriq Academy. All rights reserved.</p>
                 </div>
             </div>
         </footer>

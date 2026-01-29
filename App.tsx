@@ -99,7 +99,7 @@ const App: React.FC = () => {
     useEffect(() => {
         if (appState === 'app' && onboardingStep === 'splash') {
             try {
-                if (localStorage.getItem('cogniSacraRememberMe') === 'true') {
+                if (localStorage.getItem('empowerAfriqRememberMe') === 'true') {
                     setOnboardingStep('role-selection');
                 }
             } catch (e) {
@@ -155,7 +155,7 @@ const App: React.FC = () => {
 
     const handleLogout = useCallback(() => {
         try {
-            localStorage.removeItem('cogniSacraRememberMe');
+            localStorage.removeItem('empowerAfriqRememberMe');
         } catch (e) {
             console.warn("Could not clear 'Remember Me' preference from localStorage.");
         }
@@ -258,7 +258,7 @@ const App: React.FC = () => {
                 certificates: [],
                 learningGoals: [],
                 skills: [],
-                bio: `Eager to start my learning journey on Cogni-Sacra!`,
+                bio: `Eager to start my learning journey on EmpowerAfriq Academy!`,
                 contact: { email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com` },
                 location: { city: '', country: '' },
                 education: [],

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage, UserRole } from '../types';
 import { sendMessageToTutor, sendMessageToArchitect } from '../services/geminiService';
@@ -47,7 +46,7 @@ const AITutorView: React.FC<AITutorViewProps> = ({ isEmbedded = false, userRole 
     const sendMessage = isArchitectMode ? sendMessageToArchitect : sendMessageToTutor;
     const initialMessage = isArchitectMode
         ? "Hello! I'm your AI Architect. I can help you brainstorm course ideas, create module outlines, generate quiz questions, and more. How can I help you build an amazing course today?"
-        : "Hello! I'm Cogni-Sacra AI, your personal tutor. How can I help you today? Feel free to ask me about any topic, concept, or problem you're working on.";
+        : "Hello! I'm EmpowerAfriq AI, your personal tutor. How can I help you today? Feel free to ask me about any topic, concept, or problem you're working on.";
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
