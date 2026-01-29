@@ -1,0 +1,89 @@
+
+/* This file can be used for more complex CSS that is not easily handled by Tailwind's JIT compiler or inline styles */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 500ms ease-out forwards;
+}
+
+/* Added for card stagger animations */
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-stagger-in {
+    animation: staggerIn 500ms ease-out forwards;
+    opacity: 0;
+}
+
+/* Added for floating background elements */
+@keyframes float {
+    0% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-20px) translateX(5px); }
+    100% { transform: translateY(0px) translateX(0px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Added for dashboard scanning VFX */
+@keyframes scan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(500px); opacity: 0; }
+}
+
+.animate-scan {
+    animation: scan 4s linear infinite;
+}
+
+/* 3D Scene Transitions */
+.perspective-container {
+  perspective: 1500px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.backface-hidden {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Additional styling for a more modern feel */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

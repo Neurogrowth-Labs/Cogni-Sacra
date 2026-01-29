@@ -1,0 +1,9 @@
+{
+  "name": "Cogni-Sacra - AI-Powered Education Platform",
+  "description": "A next-generation online education platform that delivers world-class digital learning experiences. The app combines cutting-edge UI/UX, AI personalization, and scalable infrastructure to empower learners, educators, and institutions globally.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "geolocation"
+  ]
+}
