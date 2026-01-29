@@ -1,3 +1,4 @@
+
 import { Course, UserProfile, Job, FullInstitutionData, CommunityPost, Mentor, Club, UserSettings, Program, InstructorSettings, MentorshipMeeting, SubscriptionTier } from './types';
 import BookOpenIcon from './components/icons/BookOpenIcon';
 import SparklesIcon from './components/icons/SparklesIcon';
@@ -118,7 +119,7 @@ Now, let's move on to useEffect. This hook lets you perform side effects in your
         id: 'm-extra',
         title: 'Module 3: Advanced Concepts',
         lessons: [
-          { id: 'l-vr', title: 'VR Code Review Session', duration: '45 min', isCompleted: false, format: 'metaverse', isLocked: true },
+          { id: 'l-vr', title: 'Advanced Code Review', duration: '45 min', isCompleted: false, format: 'video', isLocked: true },
           { id: 'l-aq', title: 'Adaptive Hooks Assessment', duration: '30 min', isCompleted: false, format: 'adaptive-quiz', isLocked: true },
         ],
       },

@@ -1,6 +1,7 @@
+
 import React from 'react';
 
-export type LessonFormat = 'video' | 'reading' | 'quiz' | 'metaverse' | 'adaptive-quiz' | 'project' | 'live-session';
+export type LessonFormat = 'video' | 'reading' | 'quiz' | 'adaptive-quiz' | 'project' | 'live-session' | 'metaverse';
 export type UserRole = 'learner' | 'instructor' | 'institution';
 
 export interface DiscussionPost {

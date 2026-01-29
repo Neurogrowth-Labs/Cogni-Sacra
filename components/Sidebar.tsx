@@ -230,10 +230,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
 
     return (
         <aside 
-            className={`fixed inset-y-0 left-0 z-40 h-[calc(100vh-2rem)] my-4 ml-4 rounded-3xl glass-panel md:transition-all transition-transform duration-500 ease-in-out shadow-glass dark:shadow-glass-dark ${isOpen ? 'translate-x-0 w-64' : '-translate-x-[120%] md:translate-x-0 md:w-20'} flex flex-col`}
+            className={`h-full my-4 ml-4 rounded-3xl glass-panel flex flex-col shadow-glass dark:shadow-glass-dark transition-all duration-500 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}
         >
-            <div className={`flex items-center h-20 px-6 justify-between`}>
-                <div className={`flex items-center space-x-3 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden md:inline-block md:opacity-0 md:w-0'}`}>
+            <div className={`flex items-center h-20 px-6 justify-between flex-shrink-0`}>
+                <div className={`flex items-center space-x-3 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
                     <CogniSacraLogo className="w-9 h-9" />
                     <span className="font-bold text-xl text-gray-900 dark:text-white font-serif tracking-tight">Cogni</span>
                 </div>
@@ -243,7 +243,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                          <CogniSacraLogo className="w-10 h-10" />
                     </div>
                 )}
-                 <button onClick={() => setSidebarOpen(!isOpen)} className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-transform duration-300 ${isOpen ? '' : 'rotate-180 absolute right-[-12px] bg-white dark:bg-gray-800 shadow-md border dark:border-gray-700'}`} aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}>
+                 <button onClick={() => setSidebarOpen(!isOpen)} className={`hidden lg:block p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-transform duration-300 ${isOpen ? '' : 'rotate-180 absolute right-[-12px] top-8 bg-white dark:bg-gray-800 shadow-md border dark:border-gray-700'}`} aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}>
                     <ChevronLeftIcon className="w-5 h-5" />
                 </button>
             </div>
@@ -256,7 +256,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
 
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-4"></div>
                     
-                    <p className={`px-4 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                    <p className={`px-4 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
                         {aiSuiteText}
                     </p>
                     <ul>
@@ -283,19 +283,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                         />
                     </ul>
                     
-                    <div className={`mt-4 pt-4 ${isOpen ? 'block' : 'hidden'}`}>
+                    <div className={`mt-4 pt-4 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
                         <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
                                 {legalText}
                             </p>
                             <ul className="space-y-1">
                                 <li>
-                                    <button onClick={() => onNavigate('data-policy')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors">
+                                    <button onClick={() => onNavigate('data-policy')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left">
                                         {dataPolicyText}
                                     </button>
                                 </li>
                                 <li>
-                                    <button onClick={() => onNavigate('terms-of-service')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors">
+                                    <button onClick={() => onNavigate('terms-of-service')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left">
                                         {termsText}
                                     </button>
                                 </li>

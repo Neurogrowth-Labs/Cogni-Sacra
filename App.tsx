@@ -52,15 +52,15 @@ type TextSize = 'base' | 'lg' | 'xl';
 type AppState = 'landing' | 'app';
 
 const App: React.FC = () => {
-    const [appState, setAppState] = useState<AppState>('landing');
-    const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('splash');
-    const [currentView, setCurrentView] = useState<View>('dashboard');
+    const [appState, setAppState] = useState<AppState>('app');
+    const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('loaded');
+    const [currentView, setCurrentView] = useState<View>('course-landing');
     const [userRole, setUserRole] = useState<UserRole>('learner');
-    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses.find(c => c.id === 'react-mastery') || null);
     const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
     const [courses, setCourses] = useState<Course[]>(initialCourses);
     const [currentQuiz, setCurrentQuiz] = useState<Lesson | null>(null);
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [instructorCourses, setInstructorCourses] = useState<Course[]>(initialInstructorCourses);
     const [editingCourse, setEditingCourse] = useState<Course | null>(null);
     const [isCompletionModalOpen, setCompletionModalOpen] = useState(false);
@@ -110,12 +110,11 @@ const App: React.FC = () => {
 
 
     useEffect(() => {
-        // Close sidebar on view change on mobile
         const handleResize = () => {
-            if (window.innerWidth >= 768) { // md breakpoint
-                setSidebarOpen(true);
-            } else {
+            if (window.innerWidth < 1024) { 
                 setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
             }
         };
         window.addEventListener('resize', handleResize);
@@ -194,7 +193,7 @@ const App: React.FC = () => {
     }, []);
 
     const handleNavigate = useCallback((view: View) => {
-        if (window.innerWidth < 768) {
+        if (window.innerWidth < 1024) {
             setSidebarOpen(false);
         }
         setCurrentView(view);
@@ -514,24 +513,16 @@ const App: React.FC = () => {
                     />
                 );
             case 'vr-classroom':
-                 return currentLesson && selectedCourse ? (
-                    <VRClassroomView 
-                        course={selectedCourse} 
-                        lesson={currentLesson} 
-                        onBack={() => setCurrentView('course')} 
-                    />
-                ) : (
-                    <Dashboard 
-                        courses={personalizedCourses} 
-                        onSelectCourse={handleSelectCourse} 
-                        onNavigate={handleNavigate} 
-                        bookmarkedCourseIds={bookmarkedCourseIds}
-                        onToggleBookmark={handleToggleBookmark}
-                        userName={dashboardUserName}
-                        searchTerm={searchTerm}
-                        userRole={userRole}
-                    />
-                );
+                 return <Dashboard 
+                    courses={personalizedCourses} 
+                    onSelectCourse={handleSelectCourse} 
+                    onNavigate={handleNavigate} 
+                    bookmarkedCourseIds={bookmarkedCourseIds}
+                    onToggleBookmark={handleToggleBookmark}
+                    userName={dashboardUserName}
+                    searchTerm={searchTerm}
+                    userRole={userRole}
+                />;
             case 'project-submission':
                  return currentLesson && selectedCourse ? (
                     <ProjectSubmissionView
@@ -720,22 +711,29 @@ const App: React.FC = () => {
             )
         }
         return (
-            <div className={`min-h-screen bg-transparent text-gray-800 dark:text-gray-200 ${getTextSizeClass()}`}>
+            <div className={`h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex ${getTextSizeClass()}`}>
+                {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (
                     <div
                         onClick={() => setSidebarOpen(false)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
                         aria-hidden="true"
                     />
                 )}
-                <Sidebar 
-                    isOpen={isSidebarOpen} 
-                    onNavigate={handleNavigate} 
-                    currentView={currentView}
-                    setSidebarOpen={setSidebarOpen}
-                    userRole={userRole}
-                />
-                <div className={`transition-all duration-500 ease-out flex flex-col min-h-screen ${isSidebarOpen ? 'md:pl-64' : 'md:pl-20'}`}>
+                
+                {/* Sidebar - fixed on mobile, flex item on desktop */}
+                <div className={`fixed inset-y-0 left-0 z-40 lg:static lg:z-0 lg:h-full lg:flex-shrink-0 transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:w-20 lg:translate-x-0'}`}>
+                    <Sidebar 
+                        isOpen={isSidebarOpen} 
+                        onNavigate={handleNavigate} 
+                        currentView={currentView}
+                        setSidebarOpen={setSidebarOpen}
+                        userRole={userRole}
+                    />
+                </div>
+
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden relative">
                     <Header 
                         onToggleSidebar={() => setSidebarOpen(!isSidebarOpen)} 
                         isSidebarOpen={isSidebarOpen} 
@@ -750,11 +748,15 @@ const App: React.FC = () => {
                         searchTerm={searchTerm}
                         onSearchChange={setSearchTerm}
                     />
-                    <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4">
-                        {renderContent()}
+                    
+                    <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 scroll-smooth">
+                        <div className="max-w-7xl mx-auto pb-10">
+                            {renderContent()}
+                        </div>
+                        <Footer onNavigate={handleNavigate} />
                     </main>
-                    <Footer onNavigate={handleNavigate} />
                 </div>
+
                  <LessonCompletionModal 
                     isOpen={isCompletionModalOpen}
                     onClose={() => setCompletionModalOpen(false)}
@@ -771,15 +773,18 @@ const App: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen perspective-container">
-            <div className={`relative w-full h-full min-h-screen preserve-3d transition-transform duration-1000 ${appState === 'app' ? 'rotate-y-180' : ''}`}>
-                <div className="absolute w-full h-full min-h-screen backface-hidden">
+        <div className="min-h-screen">
+            {/* Logic for Landing/App flip */}
+            {appState === 'landing' ? (
+                 <div className="absolute w-full h-full min-h-screen">
                      <LandingPage onGetStarted={() => handleSetAppState('app')} />
                 </div>
-                <div className="absolute w-full h-full min-h-screen backface-hidden rotate-y-180 bg-gray-50/50 dark:bg-gray-900/50">
+            ) : (
+                /* Once in app mode, render without the 3D wrapper to fix fixed positioning contexts */
+                <div className="absolute w-full h-full min-h-screen bg-gray-50/50 dark:bg-gray-900/50">
                      {renderAppContent()}
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -386,7 +386,7 @@ const LessonEditor: React.FC<{
                         <div>
                             <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">Format</label>
                             <select value={lesson.format} onChange={(e) => onLessonChange(moduleId, lesson.id, 'format', e.target.value)} className="mt-1 block w-full text-sm p-1.5 border rounded-md dark:bg-gray-900 border-gray-300 dark:border-gray-600 focus:border-crimson focus:ring-crimson">
-                                <option value="video">Video</option><option value="reading">Reading</option><option value="quiz">Quiz</option><option value="live-session">Live Session</option><option value="project">Project</option>
+                                <option value="video">Video</option><option value="reading">Reading</option><option value="quiz">Quiz</option><option value="live-session">Live Session</option><option value="project">Project</option><option value="metaverse">Metaverse</option>
                             </select>
                         </div>
                         <div>

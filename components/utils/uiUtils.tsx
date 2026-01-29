@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Lesson, Resource } from '../../types';
 import VideoCameraIcon from '../icons/VideoCameraIcon';
@@ -21,12 +22,12 @@ export const getLessonIcon = (format: Lesson['format'], className: string = "w-6
             return <ClipboardCheckIcon className={`${className} text-amber-500`} />;
         case 'adaptive-quiz':
             return <ClipboardCheckIcon className={`${className} text-rose-500`} />;
-        case 'metaverse':
-            return <CubeTransparentIcon className={`${className} text-cyan-500`} />;
         case 'project':
             return <FolderOpenIcon className={`${className} text-purple-500`} />;
         case 'live-session':
             return <SignalIcon className={`${className} text-red-500`} />;
+        case 'metaverse':
+            return <CubeTransparentIcon className={`${className} text-indigo-500`} />;
         default:
             return <ListBulletIcon className={`${className} text-gray-500`} />;
     }

@@ -29,8 +29,6 @@ const getLessonActionText = (format: Lesson['format']) => {
             return 'Start Quiz';
         case 'adaptive-quiz':
             return 'Start Assessment';
-        case 'metaverse':
-            return 'Enter VR';
         case 'project':
             return 'View Project';
         case 'live-session':
@@ -43,11 +41,7 @@ const getLessonActionText = (format: Lesson['format']) => {
 const LessonItem: React.FC<{ lesson: Lesson, onStartLesson: (lesson: Lesson) => void, onShowComingSoon: () => void }> = ({ lesson, onStartLesson, onShowComingSoon }) => {
     const handleActionClick = () => {
         if (lesson.isLocked) return;
-        if (lesson.format === 'metaverse') {
-            onShowComingSoon();
-        } else {
-            onStartLesson(lesson);
-        }
+        onStartLesson(lesson);
     };
     
     return (
@@ -159,8 +153,8 @@ const CourseDetailView: React.FC<CourseDetailViewProps> = ({ course, onBack, onS
         <ComingSoonModal 
             isOpen={isComingSoonModalOpen}
             onClose={() => setComingSoonModalOpen(false)}
-            featureName="Metaverse Classroom"
-            featureDescription="Get ready for a fully immersive VR/AR learning experience. This feature is currently under development and will be available soon!"
+            featureName="Feature Coming Soon"
+            featureDescription="We are working hard to bring this feature to you!"
         />
         <FeedbackModal 
             isOpen={isFeedbackModalOpen}

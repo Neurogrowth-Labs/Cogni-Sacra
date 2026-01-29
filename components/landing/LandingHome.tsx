@@ -3,8 +3,8 @@ import React from 'react';
 import SparklesIcon from '../icons/SparklesIcon';
 import TrendingUpIcon from '../icons/TrendingUpIcon';
 import BriefcaseIcon from '../icons/BriefcaseIcon';
-import CubeTransparentIcon from '../icons/CubeTransparentIcon';
 import StarIcon from '../icons/StarIcon';
+import FolderOpenIcon from '../icons/FolderOpenIcon';
 
 interface LandingHomeProps {
     onGetStarted: () => void;
@@ -226,8 +226,8 @@ const LandingHome: React.FC<LandingHomeProps> = ({ onGetStarted }) => {
                             </FeatureCard>
                         </div>
                          <div className="animate-stagger-in" style={{ animationDelay: '500ms' }}>
-                            <FeatureCard icon={<CubeTransparentIcon className="w-6 h-6" />} title="Immersive Learning">
-                                Engage with content like never before through interactive simulations and VR classrooms.
+                            <FeatureCard icon={<FolderOpenIcon className="w-6 h-6" />} title="Real-World Projects">
+                                Apply your knowledge with hands-on projects that build your portfolio and practical skills.
                             </FeatureCard>
                         </div>
                     </div>
