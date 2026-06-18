@@ -105,6 +105,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, userRole, onLogout, on
     const displayName = userRole === 'institution' ? institutionName : userName;
     const displayAvatarUrl = userRole === 'institution' ? institutionLogoUrl : userAvatarUrl;
 
+    const handleLogoutClick = async () => {
+        setUserMenuOpen(false);
+        await onLogout();
+    };
+
     return (
         <header className="sticky top-4 z-30 mx-4 sm:mx-6 lg:mx-8 mb-6">
             <div className="glass-panel rounded-2xl px-4 sm:px-6 py-3 shadow-glass dark:shadow-glass-dark flex items-center justify-between transition-all duration-300">
@@ -220,7 +225,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, userRole, onLogout, on
                                     </button>
                                 </div>
                                 <div className="py-2 border-t border-gray-100 dark:border-gray-700">
-                                    <button onClick={() => { onLogout(); setUserMenuOpen(false); }} className="w-full flex items-center px-5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium">
+                                    <button onClick={handleLogoutClick} className="w-full flex items-center px-5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium">
                                         <LogoutIcon className="w-4 h-4 mr-3" /> Log Out
                                     </button>
                                 </div>

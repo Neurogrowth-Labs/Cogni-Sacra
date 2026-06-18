@@ -44,6 +44,7 @@ import SubscriptionView from './components/SubscriptionView';
 import AIToolsView from './components/AIToolsView';
 import LiveConversationView from './components/LiveConversationView';
 import LandingPage from './components/landing/LandingPage';
+import { supabase } from './services/supabaseClient';
 
 type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'live-conversation';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded';
@@ -79,6 +80,7 @@ const App: React.FC = () => {
     const [isFlipping, setIsFlipping] = useState(false);
     const [learnerInterests, setLearnerInterests] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [session, setSession] = useState<any>(null);
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -88,6 +90,142 @@ const App: React.FC = () => {
         }
     }, [theme]);
     
+    // Supabase Auth Listener
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            if (session) fetchUserProfile(session.user.id);
+        });
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            if (session) fetchUserProfile(session.user.id);
+            else {
+                // Handle logout state cleanup if necessary
+                setUserProfileData(initialUserProfile);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const fetchUserProfile = async (userId: string) => {
+        try {
+            // 1. Fetch Basic Profile
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (profileError || !profile) {
+                console.warn("Error fetching profile:", profileError?.message);
+                return;
+            }
+
+            const currentRole = profile.role as UserRole;
+            setUserRole(currentRole);
+
+            // 2. Fetch Role Specific Data
+            if (currentRole === 'learner') {
+                const { data: learnerData, error: learnerError } = await supabase
+                    .from('learners_data')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (learnerData && !learnerError) {
+                    setUserProfileData(prev => ({
+                        ...prev,
+                        name: profile.full_name || prev.name,
+                        avatarUrl: profile.avatar_url || prev.avatarUrl,
+                        bio: learnerData.bio || prev.bio,
+                        title: learnerData.title || prev.title,
+                        username: learnerData.username || prev.username,
+                        coverImageUrl: learnerData.cover_image_url || prev.coverImageUrl,
+                        location: {
+                            city: learnerData.location_city || '',
+                            country: learnerData.location_country || ''
+                        },
+                        skills: learnerData.skills || prev.skills,
+                        socialLinks: learnerData.social_links || prev.socialLinks,
+                        education: learnerData.education || prev.education,
+                        learningGoals: learnerData.learning_goals || prev.learningGoals,
+                        mentorshipStatus: learnerData.mentorship_status || prev.mentorshipStatus,
+                        targetCareer: learnerData.target_career || prev.targetCareer
+                    }));
+                }
+            } else if (currentRole === 'instructor') {
+                const { data: instructorData, error: instrError } = await supabase
+                    .from('instructors_data')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (instructorData && !instrError) {
+                    // Update main profile for header display
+                    setUserProfileData(prev => ({
+                        ...prev,
+                        name: profile.full_name || prev.name,
+                        avatarUrl: profile.avatar_url || prev.avatarUrl,
+                    }));
+                    
+                    // Update Instructor Settings
+                    setInstructorSettingsData(prev => ({
+                        ...prev,
+                        publicProfile: {
+                            ...prev.publicProfile,
+                            displayName: instructorData.display_name || profile.full_name,
+                            bio: instructorData.bio || prev.publicProfile.bio,
+                            socialLinks: instructorData.social_links || prev.publicProfile.socialLinks,
+                            accreditations: instructorData.accreditations || prev.publicProfile.accreditations,
+                            licenses: instructorData.licenses || prev.publicProfile.licenses,
+                            resumeUrl: instructorData.resume_url || prev.publicProfile.resumeUrl
+                        },
+                        payout: instructorData.payout_settings || prev.payout,
+                        notifications: instructorData.notification_settings || prev.notifications
+                    }));
+                }
+            } else if (currentRole === 'institution') {
+                 const { data: instData, error: instError } = await supabase
+                    .from('institutions_data')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (instData && !instError) {
+                    setInstitutionData(prev => ({
+                        ...prev,
+                        name: instData.name || prev.name,
+                        profile: {
+                            ...prev.profile,
+                            tagline: instData.tagline || prev.profile.tagline,
+                            about: instData.about || prev.profile.about,
+                            bannerUrl: instData.banner_url || prev.profile.bannerUrl,
+                            website: instData.website || prev.profile.website,
+                            contact: {
+                                email: instData.contact_email || prev.profile.contact.email,
+                                phone: instData.contact_phone || prev.profile.contact.phone
+                            }
+                        },
+                        branding: {
+                            ...prev.branding,
+                            logoUrl: instData.branding_logo_url || prev.branding.logoUrl,
+                            primaryColor: instData.branding_primary_color || prev.branding.primaryColor
+                        },
+                        settings: instData.settings || prev.settings,
+                        monetization: instData.monetization_settings || prev.monetization
+                    }));
+                }
+            }
+
+        } catch (err) {
+            console.error("Profile fetch error:", err);
+        }
+    };
+
     const handleSetAppState = (state: AppState) => {
         setIsFlipping(true);
         setTimeout(() => {
@@ -98,15 +236,22 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (appState === 'app' && onboardingStep === 'splash') {
-            try {
-                if (localStorage.getItem('empowerAfriqRememberMe') === 'true') {
-                    setOnboardingStep('role-selection');
+            if (!session) {
+                // If not logged in via Supabase, go to auth
+                 try {
+                    // Legacy check for backward compatibility or if using local storage alongside supabase
+                    if (localStorage.getItem('empowerAfriqRememberMe') === 'true') {
+                       // Logic to handle remember me if separate from session
+                    }
+                } catch (e) {
+                    console.warn("Could not access localStorage.");
                 }
-            } catch (e) {
-                console.warn("Could not access localStorage for 'Remember Me' feature.");
+            } else {
+                // If session exists, skip auth
+                setOnboardingStep('role-selection');
             }
         }
-    }, [appState, onboardingStep]);
+    }, [appState, onboardingStep, session]);
 
 
     useEffect(() => {
@@ -153,11 +298,12 @@ const App: React.FC = () => {
     }, [allCoursesForLearner, learnerInterests, userRole]);
 
 
-    const handleLogout = useCallback(() => {
+    const handleLogout = useCallback(async () => {
         try {
+            await supabase.auth.signOut();
             localStorage.removeItem('empowerAfriqRememberMe');
         } catch (e) {
-            console.warn("Could not clear 'Remember Me' preference from localStorage.");
+            console.warn("Error signing out:", e);
         }
         handleSetAppState('landing');
         setOnboardingStep('splash');
@@ -245,36 +391,41 @@ const App: React.FC = () => {
     }, []);
 
     const handleAuthentication = useCallback((name: string) => {
-        if (name !== 'Alex Turner' && name !== 'New User') { // A bit more robust check
-            const newUserProfile: UserProfile = {
-                name: name,
-                displayName: name,
-                username: name.toLowerCase().replace(/\s+/g, '_'),
-                avatarUrl: `https://i.pravatar.cc/150?u=${name.replace(/\s+/g, '')}`,
-                title: 'Lifelong Learner',
-                coursesInProgress: 0,
-                coursesCompleted: 0,
-                achievements: [],
-                certificates: [],
-                learningGoals: [],
-                skills: [],
-                bio: `Eager to start my learning journey on EmpowerAfriq Academy!`,
-                contact: { email: `${name.toLowerCase().replace(/\s+/g, '.')}@example.com` },
-                location: { city: '', country: '' },
-                education: [],
-                socialLinks: {},
-                mentorshipStatus: 'seeking',
-                coverImageUrl: 'https://picsum.photos/seed/profile-banner/1200/300',
-            };
-            setUserProfileData(newUserProfile);
-        } else {
-            setUserProfileData(initialUserProfile); // If it's Alex, reset to default Alex profile
-        }
+        // This is triggered after successful Supabase login in LoginView
         setOnboardingStep('role-selection');
     }, []);
 
-    const handleSelectRoleOnboarding = useCallback((role: UserRole) => {
+    const handleSelectRoleOnboarding = useCallback(async (role: UserRole) => {
         setUserRole(role);
+        
+        if (session && session.user) {
+            try {
+                // Update role in profiles table
+                await supabase.from('profiles').update({ role: role }).eq('id', session.user.id);
+                
+                // Ensure corresponding table entry exists
+                if (role === 'instructor') {
+                    // Check if entry exists, if not insert
+                    const { data } = await supabase.from('instructors_data').select('id').eq('id', session.user.id).single();
+                    if (!data) {
+                        await supabase.from('instructors_data').insert([{ id: session.user.id }]);
+                    }
+                } else if (role === 'institution') {
+                    const { data } = await supabase.from('institutions_data').select('id').eq('id', session.user.id).single();
+                    if (!data) {
+                        await supabase.from('institutions_data').insert([{ id: session.user.id, name: 'My Institution' }]);
+                    }
+                } else if (role === 'learner') {
+                     const { data } = await supabase.from('learners_data').select('id').eq('id', session.user.id).single();
+                    if (!data) {
+                        await supabase.from('learners_data').insert([{ id: session.user.id }]);
+                    }
+                }
+            } catch (e) {
+                console.error("Error updating role in Supabase:", e);
+            }
+        }
+
         if (role === 'learner') {
             setOnboardingStep('personalization');
         } else if (role === 'institution') {
@@ -284,12 +435,18 @@ const App: React.FC = () => {
             setOnboardingStep('loaded');
             setCurrentView('instructor-dashboard');
         }
-    }, []);
+    }, [session]);
 
     const handlePersonalizationComplete = useCallback((interests: string[]) => {
         setLearnerInterests(interests);
+        // Optimistically update local state, and sync to DB
+        if (session) {
+            supabase.from('learners_data').update({ skills: interests }).eq('id', session.user.id).then(({ error }) => {
+                if (error) console.error("Error saving interests:", error);
+            });
+        }
         setOnboardingStep('welcome');
-    }, []);
+    }, [session]);
 
     const handleSelectInstitutionPlan = useCallback((planName: string) => {
         setInstitutionSubscriptionPlan(planName);
@@ -384,8 +541,34 @@ const App: React.FC = () => {
 
     const handleSaveProfile = useCallback((updatedProfile: UserProfile) => {
         setUserProfileData(updatedProfile);
+        
+        // Sync to Supabase
+        if (session) {
+            const updates: any = {
+                username: updatedProfile.username,
+                bio: updatedProfile.bio,
+                title: updatedProfile.title,
+                location_city: updatedProfile.location?.city,
+                location_country: updatedProfile.location?.country,
+                skills: updatedProfile.skills,
+                social_links: updatedProfile.socialLinks,
+                learning_goals: updatedProfile.learningGoals,
+                target_career: updatedProfile.targetCareer
+            };
+            
+            // Also update main profile table for name/avatar
+            supabase.from('profiles').update({
+                full_name: updatedProfile.name,
+                avatar_url: updatedProfile.avatarUrl
+            }).eq('id', session.user.id).then();
+
+            supabase.from('learners_data').update(updates).eq('id', session.user.id).then(({ error }) => {
+                if (error) console.error("Error saving profile to DB:", error);
+            });
+        }
+
         setCurrentView('profile');
-    }, []);
+    }, [session]);
     
     const handleSaveInstitutionProfile = useCallback((updatedData: FullInstitutionData) => {
         setInstitutionData(updatedData);

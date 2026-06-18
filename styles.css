@@ -1,15 +1,3 @@
-@import "tailwindcss";
-
-@theme {
-  --color-crimson: #A51C30;
-  --color-crimson-dark: #8a1628;
-  --color-crimson-light: #d44d5f;
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: 'Lora', serif;
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --shadow-glass-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 15px rgba(165, 28, 48, 0.3);
-}
 
 /* This file can be used for more complex CSS that is not easily handled by Tailwind's JIT compiler or inline styles */
 @keyframes fadeIn {

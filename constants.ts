@@ -1,3 +1,4 @@
+
 import { Course, UserProfile, Job, FullInstitutionData, CommunityPost, Mentor, Club, UserSettings, Program, InstructorSettings, MentorshipMeeting, SubscriptionTier } from './types';
 import BookOpenIcon from './components/icons/BookOpenIcon';
 import SparklesIcon from './components/icons/SparklesIcon';
