@@ -6,6 +6,7 @@ import ChartBarIcon from './icons/ChartBarIcon';
 import UserPlusIcon from './icons/UserPlusIcon';
 import MentorshipRequestCard from './MentorshipRequestCard';
 import CheckIcon from './icons/CheckIcon';
+import { Radio } from 'lucide-react';
 
 interface InstructorDashboardViewProps {
     courses: Course[];
@@ -15,6 +16,8 @@ interface InstructorDashboardViewProps {
     onViewAnalytics: (course: Course) => void;
     seekingMentorshipLearners: UserProfile[];
     subscriptionPlan: string | null;
+    rejoinSession?: any;
+    onRejoinSession?: () => void;
 }
 
 const InstructorCourseCard: React.FC<{ 
@@ -48,9 +51,40 @@ const InstructorCourseCard: React.FC<{
     </div>
 );
 
-const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = ({ courses, onEditCourse, onViewCourse, onCreateCourse, onViewAnalytics, seekingMentorshipLearners, subscriptionPlan }) => {
+const InstructorDashboardView: React.FC<InstructorDashboardViewProps> = ({ 
+    courses, 
+    onEditCourse, 
+    onViewCourse, 
+    onCreateCourse, 
+    onViewAnalytics, 
+    seekingMentorshipLearners, 
+    subscriptionPlan,
+    rejoinSession,
+    onRejoinSession
+}) => {
     return (
         <div className="animate-fade-in">
+            {rejoinSession && (
+                <div id="instructor-rejoin-banner" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm animate-pulse-subtle">
+                    <div className="flex items-center gap-3">
+                         <div className="p-2.5 bg-crimson text-white rounded-xl">
+                              <Radio className="w-5 h-5 animate-pulse" />
+                         </div>
+                         <div>
+                              <h3 className="text-sm font-bold text-gray-900">Live Session Interrupted / Left</h3>
+                              <p className="text-xs text-slate-600 font-medium mt-0.5">
+                                   "{rejoinSession.title}" is currently active. Click below to rejoin the session.
+                              </p>
+                         </div>
+                    </div>
+                    <button 
+                         onClick={onRejoinSession}
+                         className="px-4 py-2 text-xs font-bold text-white bg-crimson hover:bg-red-800 rounded-xl shadow cursor-pointer transition flex items-center gap-1 shrink-0"
+                    >
+                         Rejoin Live Class &rarr;
+                    </button>
+                </div>
+            )}
             <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                 <div>
                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white font-serif">Instructor Dashboard</h1>

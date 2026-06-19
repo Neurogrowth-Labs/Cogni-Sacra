@@ -42,11 +42,11 @@ import DataPolicyView from './components/DataPolicyView';
 import TermsOfServiceView from './components/TermsOfServiceView';
 import SubscriptionView from './components/SubscriptionView';
 import AIToolsView from './components/AIToolsView';
-import LiveConversationView from './components/LiveConversationView';
+import VirtualClassroomView from './components/VirtualClassroomView';
 import LandingPage from './components/landing/LandingPage';
 import { supabase } from './services/supabaseClient';
 
-type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'live-conversation';
+type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
@@ -81,6 +81,7 @@ const App: React.FC = () => {
     const [learnerInterests, setLearnerInterests] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [session, setSession] = useState<any>(null);
+    const [rejoinSession, setRejoinSession] = useState<any>(null);
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -95,6 +96,8 @@ const App: React.FC = () => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
             if (session) fetchUserProfile(session.user.id);
+        }).catch(err => {
+            console.warn("Supabase initial session fetch error:", err);
         });
 
         const {
@@ -795,6 +798,10 @@ const App: React.FC = () => {
                     onViewAnalytics={handleViewAnalytics} 
                     seekingMentorshipLearners={seekingMentorshipLearners}
                     subscriptionPlan={instructorSubscriptionPlan}
+                    rejoinSession={rejoinSession}
+                    onRejoinSession={() => {
+                        setCurrentView('virtual-class');
+                    }}
                 />;
             case 'course-builder':
                 return editingCourse ? (
@@ -852,8 +859,25 @@ const App: React.FC = () => {
                 return <TermsOfServiceView />;
             case 'ai-tools':
                 return <AIToolsView />;
-            case 'live-conversation':
-                return <LiveConversationView />;
+            case 'virtual-class':
+                return (
+                    <VirtualClassroomView 
+                        userRole={userRole} 
+                        rejoinSessionToLoad={rejoinSession}
+                        onClearRejoinSession={() => setRejoinSession(null)}
+                        onLeaveClass={(sess) => {
+                            if (userRole === 'instructor') {
+                                setRejoinSession(sess);
+                                setCurrentView('instructor-dashboard');
+                            } else if (userRole === 'institution') {
+                                setRejoinSession(null);
+                                setCurrentView('virtual-class');
+                            } else {
+                                setCurrentView('dashboard');
+                            }
+                        }}
+                    />
+                );
             default:
                 return <Dashboard 
                     courses={personalizedCourses} 

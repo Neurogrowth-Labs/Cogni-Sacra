@@ -18,8 +18,9 @@ import InformationCircleIcon from './icons/InformationCircleIcon';
 import EnvelopeIcon from './icons/EnvelopeIcon';
 import CogniSacraLogo from './icons/IntelliLearnLogo';
 import SignalIcon from './icons/SignalIcon';
+import { Video } from 'lucide-react';
 
-type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'live-conversation';
+type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -176,6 +177,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 isOpen={isOpen}
                 onClick={() => onNavigate('institution-dashboard')}
             />
+            <NavItem
+                icon={<Video size={20} />}
+                label="Portal"
+                isActive={currentView === 'virtual-class'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('virtual-class')}
+            />
              <NavItem
                 icon={<BuildingLibraryIcon />}
                 label="Profile"
@@ -209,13 +217,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 isOpen={isOpen}
                 onClick={() => onNavigate('ai-tools')}
             />
-            <NavItem
-                icon={<SignalIcon />}
-                label="Live Conversation"
-                isActive={currentView === 'live-conversation'}
-                isOpen={isOpen}
-                onClick={() => onNavigate('live-conversation')}
-            />
+            {userRole === 'instructor' && (
+                <NavItem
+                    icon={<Video size={20} />}
+                    label="Go Live"
+                    isActive={currentView === 'virtual-class'}
+                    isOpen={isOpen}
+                    onClick={() => onNavigate('virtual-class')}
+                />
+            )}
         </>
     );
 

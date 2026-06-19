@@ -10,6 +10,7 @@ import BarChart from './shared/BarChart';
 import DoughnutChart from './shared/DoughnutChart';
 import InstitutionCourseCard from './InstitutionCourseCard';
 import CheckIcon from './icons/CheckIcon';
+import { Radio } from 'lucide-react';
 
 interface InstitutionDashboardViewProps {
     institutionData: FullInstitutionData;
@@ -19,7 +20,13 @@ interface InstitutionDashboardViewProps {
     subscriptionPlan: string | null;
 }
 
-const InstitutionDashboardView: React.FC<InstitutionDashboardViewProps> = ({ institutionData, onCreateCourse, onEditCourse, onViewCourse, subscriptionPlan }) => {
+const InstitutionDashboardView: React.FC<InstitutionDashboardViewProps> = ({ 
+    institutionData, 
+    onCreateCourse, 
+    onEditCourse, 
+    onViewCourse, 
+    subscriptionPlan
+}) => {
     const { name, analytics, courses } = institutionData;
 
     // Prepare data for charts
