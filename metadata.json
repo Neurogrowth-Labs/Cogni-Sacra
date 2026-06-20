@@ -1,6 +1,6 @@
 {
   "name": "EmpowerAfriq Academy - AI-Powered Education Platform",
-  "description": "A next-generation online education platform that delivers world-class digital learning experiences. The app combines cutting-edge UI/UX, AI personalization, and scalable infrastructure to empower learners, educators, and institutions globally.",
+  "description": "A next-generation online education platform featuring Africa's premier AI-powered Virtual Library ecosystem, real-time STEM simulation labs, and personalized CogniSacra Knowledge Twin cognitive companions.",
   "requestFramePermissions": [
     "microphone",
     "camera",

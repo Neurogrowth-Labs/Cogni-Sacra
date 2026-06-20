@@ -34,9 +34,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     };
 
     return (
-        <div className="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+        <div className="bg-[#FCFCFD] text-slate-900 min-h-screen relative selection:bg-red-100 selection:text-red-750">
             <LandingHeader currentView={view} setView={setView} onGetStarted={onGetStarted} />
-            <main>
+            <main className="relative z-10">
                 {renderView()}
             </main>
             <LandingFooter setView={setView} />

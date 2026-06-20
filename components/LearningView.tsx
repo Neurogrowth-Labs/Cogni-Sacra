@@ -1,16 +1,18 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Course, Lesson, DiscussionPost, Annotation } from '../types';
-import ChevronLeftIcon from './icons/ChevronLeftIcon';
-import ListBulletIcon from './icons/ListBulletIcon';
-import ChatBubbleLeftRightIcon from './icons/ChatBubbleLeftRightIcon';
-import PencilSquareIcon from './icons/PencilSquareIcon';
-import SparklesIcon from './icons/SparklesIcon';
+import { 
+    ChevronLeft, 
+    List, 
+    MessageSquare, 
+    Edit, 
+    Sparkles, 
+    Check, 
+    X, 
+    BookOpen 
+} from 'lucide-react';
 import { sendMessageToAI } from '../services/geminiService';
 import { getLessonIcon } from './utils/uiUtils';
-import CheckIcon from './icons/CheckIcon';
-import XMarkIcon from './icons/XMarkIcon';
-import ChatBubbleLeftEllipsisIcon from './icons/ChatBubbleLeftEllipsisIcon';
 
 type SidebarTab = 'syllabus' | 'notes' | 'annotations';
 type InfoTab = 'transcript' | 'discussion';
@@ -96,7 +98,7 @@ const NotesPanel: React.FC<{ lesson: Lesson }> = ({ lesson }) => {
                     disabled={isSummarizing}
                     className="mt-4 w-full flex items-center justify-center py-2 px-4 bg-crimson text-white rounded-lg font-semibold hover:bg-red-800 disabled:bg-red-400"
                 >
-                    <SparklesIcon className="w-5 h-5 mr-2" />
+                    <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
                     {isSummarizing ? 'Summarizing...' : 'AI Auto-Summarize'}
                 </button>
             )}
@@ -506,7 +508,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
                         else btnClass = 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-60 cursor-not-allowed';
                     } else if (isSelected) btnClass = 'bg-crimson/10 dark:bg-crimson/20 border-crimson ring-2 ring-crimson';
                     return (<button key={option.id} onClick={() => handleSelectOption(option.id)} disabled={!!feedback} className={`w-full text-left p-4 border rounded-lg transition-all flex items-center ${btnClass}`}>
-                        {feedback && (isCorrect ? <CheckIcon className="w-5 h-5 mr-3 text-green-600" /> : isSelected ? <XMarkIcon className="w-5 h-5 mr-3 text-red-600" /> : <div className="w-5 h-5 mr-3"/>)} {option.text}
+                        {feedback && (isCorrect ? <Check className="w-5 h-5 mr-3 text-green-600" /> : isSelected ? <X className="w-5 h-5 mr-3 text-red-600" /> : <div className="w-5 h-5 mr-3"/>)} {option.text}
                     </button>);
                 })}</div>
                 {feedback && (<div className={`mt-6 p-4 rounded-lg animate-fade-in ${feedback.isCorrect ? 'bg-green-50 dark:bg-green-900/50 text-green-800 dark:text-green-200' : 'bg-red-50 dark:bg-red-900/50 text-red-800 dark:text-red-200'}`}>
@@ -527,8 +529,8 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
             )}
             <div className="border-b border-gray-200 dark:border-gray-700">
                 <nav className="flex space-x-4 px-4 sm:px-6">
-                    <TabButton isActive={infoTab === 'transcript'} onClick={() => setInfoTab('transcript')}><ListBulletIcon className="w-5 h-5 mr-2" /> Transcript</TabButton>
-                    <TabButton isActive={infoTab === 'discussion'} onClick={() => setInfoTab('discussion')}><ChatBubbleLeftRightIcon className="w-5 h-5 mr-2" /> Discussion</TabButton>
+                    <TabButton isActive={infoTab === 'transcript'} onClick={() => setInfoTab('transcript')}><List className="w-5 h-5 mr-2" /> Transcript</TabButton>
+                    <TabButton isActive={infoTab === 'discussion'} onClick={() => setInfoTab('discussion')}><MessageSquare className="w-5 h-5 mr-2" /> Discussion</TabButton>
                 </nav>
             </div>
             <div className="flex-1 overflow-y-auto relative" onMouseUp={handleMouseUp} onMouseDown={() => setSelection(null)}>
@@ -542,7 +544,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
     return (
         <div className="flex flex-col lg:flex-row h-full max-h-[calc(100vh-8rem)] animate-fade-in gap-6">
             <div className="flex-1 flex flex-col min-w-0">
-                <div className="flex-shrink-0 mb-4"><button onClick={onBack} className="flex items-center text-crimson dark:text-crimson/90 hover:underline font-semibold"><ChevronLeftIcon className="w-5 h-5 mr-2" />Back to Course Details</button><h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2 font-serif">{lesson.title}</h1></div>
+                <div className="flex-shrink-0 mb-4"><button onClick={onBack} className="flex items-center text-crimson dark:text-crimson/90 hover:underline font-semibold"><ChevronLeft className="w-5 h-5 mr-2" />Back to Course Details</button><h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2 font-serif">{lesson.title}</h1></div>
                 <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col overflow-hidden relative">
                     {lesson.format === 'quiz' ? renderQuizContent() : renderDefaultContent()}
                     {selection && <button onClick={() => setAnnotationModalOpen(true)} className="absolute bg-black text-white px-3 py-1 rounded-full text-sm shadow-lg" style={{ top: `${selection.rect.top - 40}px`, left: `${selection.rect.left + selection.rect.width / 2}px`, transform: 'translateX(-50%)' }}>Annotate</button>}
@@ -551,9 +553,9 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
             </div>
             <div className="w-full lg:w-96 flex-shrink-0 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col overflow-hidden">
                 <div className="border-b border-gray-200 dark:border-gray-700"><nav className="flex">
-                    <SidebarTabButton isActive={sidebarTab === 'syllabus'} onClick={() => setSidebarTab('syllabus')}><ListBulletIcon className="w-5 h-5 mr-2" /> Syllabus</SidebarTabButton>
-                    <SidebarTabButton isActive={sidebarTab === 'notes'} onClick={() => setSidebarTab('notes')}><PencilSquareIcon className="w-5 h-5 mr-2" /> My Notes</SidebarTabButton>
-                    <SidebarTabButton isActive={sidebarTab === 'annotations'} onClick={() => setSidebarTab('annotations')}><ChatBubbleLeftEllipsisIcon className="w-5 h-5 mr-2" /> Annotations</SidebarTabButton>
+                    <SidebarTabButton isActive={sidebarTab === 'syllabus'} onClick={() => setSidebarTab('syllabus')}><List className="w-5 h-5 mr-2" /> Syllabus</SidebarTabButton>
+                    <SidebarTabButton isActive={sidebarTab === 'notes'} onClick={() => setSidebarTab('notes')}><Edit className="w-5 h-5 mr-2" /> My Notes</SidebarTabButton>
+                    <SidebarTabButton isActive={sidebarTab === 'annotations'} onClick={() => setSidebarTab('annotations')}><BookOpen className="w-5 h-5 mr-2" /> Annotations</SidebarTabButton>
                 </nav></div>
                 <div className="flex-1 overflow-y-auto">
                     {sidebarTab === 'syllabus' && <SyllabusPanel course={course} currentLessonId={lesson.id} onNavigateLesson={onNavigateLesson}/>}

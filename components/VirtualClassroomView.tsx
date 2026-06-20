@@ -406,22 +406,29 @@ export default function VirtualClassroomView({
   };
 
   // Navigation Items
-  const academyNavItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Home size={18} />, badge: null },
-    { id: 'classes', label: 'Virtual Classes', icon: <Video size={18} />, badge: 'LIVE' },
-    { id: 'calendar', label: 'Class Calendar', icon: <Calendar size={18} />, badge: null },
-    { id: 'assignments', label: 'Assignments Hub', icon: <FileText size={18} />, badge: '4' },
-    { id: 'exams', label: 'Exams & Quizzes', icon: <BookOpenCheck size={18} />, badge: '1' },
-    { id: 'files', label: 'Academic Files', icon: <FolderOpen size={18} />, badge: null },
-    { id: 'chat', label: 'Real-time Chat', icon: <MessageSquare size={18} />, badge: 'New' },
-    { id: 'attendance', label: 'Attendance logs', icon: <UserCheck size={18} />, badge: null },
-    { id: 'polls', label: 'Class Polls', icon: <BarChart4 size={18} />, badge: null },
-    { id: 'whiteboard', label: 'Whiteboard Space', icon: <Sparkles size={18} />, badge: null },
-    { id: 'breakout', label: 'Breakout Spaces', icon: <Layers size={18} />, badge: null },
-    { id: 'notes', label: 'Student Notebook', icon: <Notebook size={18} />, badge: 'AI' },
-    { id: 'notifications', label: 'Alerts & Logs', icon: <Bell size={18} />, badge: null },
-    { id: 'settings', label: 'Academy Settings', icon: <Settings size={18} />, badge: null }
-  ] as const;
+  const academyNavItems = isInstructor ? [
+    { id: 'dashboard' as const, label: 'Instructor Control Board', icon: <Home size={18} />, badge: null },
+    { id: 'classes' as const, label: 'Live Broadcast Hub', icon: <Video size={18} />, badge: 'LIVE' },
+    { id: 'calendar' as const, label: 'Session Scheduling', icon: <Calendar size={18} />, badge: null },
+    { id: 'assignments' as const, label: 'Assignments Desk', icon: <FileText size={18} />, badge: '4' },
+    { id: 'files' as const, label: 'Lecture File Publisher', icon: <FolderOpen size={18} />, badge: null },
+    { id: 'chat' as const, label: 'Class Announcements', icon: <MessageSquare size={18} />, badge: 'New' },
+    { id: 'attendance' as const, label: 'Real-time Attendance', icon: <UserCheck size={18} />, badge: null },
+    { id: 'polls' as const, label: 'Interactive Polls', icon: <BarChart4 size={18} />, badge: null },
+    { id: 'whiteboard' as const, label: 'Digital Sketchboard', icon: <Sparkles size={18} />, badge: null },
+    { id: 'breakout' as const, label: 'Breakout Rooms', icon: <Layers size={18} />, badge: null },
+    { id: 'notifications' as const, label: 'Integrity Logs & Alerts', icon: <Bell size={18} />, badge: null },
+    { id: 'settings' as const, label: 'Virtual Academy Settings', icon: <Settings size={18} />, badge: null }
+  ] : [
+    { id: 'dashboard' as const, label: 'Study Dashboard', icon: <Home size={18} />, badge: null },
+    { id: 'classes' as const, label: 'Attend Live Class', icon: <Video size={18} />, badge: 'LIVE' },
+    { id: 'calendar' as const, label: 'Class Schedules', icon: <Calendar size={18} />, badge: null },
+    { id: 'assignments' as const, label: 'My Submissions', icon: <FileText size={18} />, badge: '4' },
+    { id: 'exams' as const, label: 'Adaptive Quizzes', icon: <BookOpenCheck size={18} />, badge: '1' },
+    { id: 'files' as const, label: 'Lecture Materials', icon: <FolderOpen size={18} />, badge: null },
+    { id: 'chat' as const, label: 'Peer Study Chat', icon: <MessageSquare size={18} />, badge: 'New' },
+    { id: 'notes' as const, label: 'AI Study Notebook', icon: <Notebook size={18} />, badge: 'AI' }
+  ];
 
   // Active Live Classroom interface
   if (activeSession) {
@@ -461,19 +468,11 @@ export default function VirtualClassroomView({
       </AnimatePresence>
 
       {/* Top Academic Subheader Panel with Device Switcher & Settings */}
-      <div id="academy-top-bar" className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm transition-colors">
+      <div id="academy-top-bar" className="relative bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-sm transition-colors">
         <div className="flex items-center gap-3">
-          <div className="h-8.5 w-8.5 rounded-xl bg-gradient-to-tr from-crimson to-red-600 flex items-center justify-center text-white font-extrabold shadow shadow-red-500/30">
-            A
-          </div>
           <div>
             <h1 className="text-sm font-black tracking-wide text-slate-900 dark:text-white uppercase flex items-center gap-1.5">
-              {userRole === 'institution' ? 'Academic Virtual Portal' : 'The Academy Virtual Office'}
-              {userRole === 'institution' && (
-                <span className="bg-crimson/10 text-crimson text-[9px] font-black px-2 py-0.5 rounded-full uppercase border border-crimson/20">
-                  Authority Mode
-                </span>
-              )}
+              {!isInstructor ? 'The Academy Attend class' : 'The Instructor Space'}
             </h1>
             <p className="text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider">Enterprise Grade Academic Platform</p>
           </div>
@@ -490,150 +489,32 @@ export default function VirtualClassroomView({
             {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
           </button>
 
-          {/* Mobile Simulator Toggler */}
-          <button
-            onClick={() => {
-              setIsMobileSimulator(!isMobileSimulator);
-              triggerToast(isMobileSimulator ? "Returned to full screen desktop dashboard" : "Switched to interactive Mobile layout simulator");
-            }}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-black transition border ${
-              isMobileSimulator 
-                ? 'bg-crimson text-white border-crimson shadow shadow-crimson/20' 
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-650 dark:bg-slate-805 dark:border-slate-700 dark:text-slate-200'
-            }`}
-          >
-            <Smartphone size={13} />
-            <span className="hidden sm:inline">{isMobileSimulator ? "Desktop Layout" : "Mobile Screen View"}</span>
-          </button>
-
           {/* Profile Welcome widget */}
           <div className="hidden md:flex items-center gap-2 border-l border-slate-200 dark:border-slate-800 pl-3">
             <img 
               referrerPolicy="no-referrer"
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60" 
-              alt="Professor Profile" 
+              src={!isInstructor 
+                ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=60"
+                : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=60"
+              } 
+              alt={!isInstructor ? "Learner Profile" : "Professor Profile"} 
               className="w-7.5 h-7.5 rounded-full object-cover border border-slate-250 animate-pulse"
             />
             <div className="text-left leading-none">
-              <span className="text-[11px] font-extrabold text-slate-850 dark:text-white block">Dr. John Adebayo</span>
-              <span className="text-[9px] text-slate-400 font-black uppercase mt-0.5 block">Academic Dean</span>
+              <span className="text-[11px] font-extrabold text-slate-850 dark:text-white flex items-center gap-1">
+                {!isInstructor ? "Sarah Mwangi" : "Dr. John Adebayo"}
+                <CheckCircle2 size={11} className="text-emerald-500 fill-emerald-500 shrink-0" />
+              </span>
+              <span className="text-[9px] text-slate-400 font-black uppercase mt-0.5 block">
+                {!isInstructor ? "ID: LRN-2026-8842" : "ID: INS-2026-1042"}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Container - Conditional Mobile Emulator Template / Full Layout */}
-      {isMobileSimulator ? (
-        <div className="max-w-md mx-auto py-12 px-4">
-          <div className="relative mx-auto rounded-[40px] border-8 border-slate-900 bg-white dark:bg-slate-900 shadow-3xl overflow-hidden aspect-[9/19.5] w-full max-w-[360px] flex flex-col justify-between">
-            {/* Notched ear speaker screen */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-40 h-6 bg-slate-900 rounded-b-2xl z-50 flex items-center justify-around px-4">
-              <span className="text-[10px] text-white font-bold leading-none">09:41</span>
-              <div className="w-8 h-1 bg-slate-800 rounded-full" />
-              <div className="w-1.5 h-1.5 bg-slate-800 rounded-full" />
-            </div>
-
-            {/* Smart Screen Canvas */}
-            <div className="flex-1 pt-10 pb-12 overflow-y-auto px-4.5 bg-slate-50 dark:bg-slate-950 flex flex-col justify-between no-scrollbar">
-              
-              {/* Header */}
-              <div className="flex justify-between items-center mb-4.5">
-                <div>
-                  <span className="text-[9px] font-black uppercase text-crimson">University Core</span>
-                  <h3 className="text-base font-extrabold tracking-tight">Today's Academic</h3>
-                </div>
-                <Bell size={16} className="text-slate-405" />
-              </div>
-
-              {/* Attendance Tracker timeline */}
-              <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 space-y-2 mb-4">
-                <span className="text-[9px] uppercase font-bold text-crimson block">Active Timetable</span>
-                <div className="flex items-center justify-between border-b pb-2">
-                  <div>
-                    <h5 className="font-bold text-xs text-slate-800 dark:text-slate-100">08:00 - Data Structures</h5>
-                    <p className="text-[9px] text-slate-400">Dr. joseph Adebayo • 112 joined</p>
-                  </div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <div>
-                    <h5 className="font-bold text-xs text-slate-700 dark:text-slate-300">10:00 - Business Analytics</h5>
-                    <p className="text-[9px] text-slate-400">Undergrad Core Module</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic Action Join Live */}
-              <div className="bg-gradient-to-tr from-crimson to-red-600 rounded-2xl p-4 text-white shadow-md mb-4 flex flex-col justify-between h-32">
-                <div>
-                  <span className="inline-flex items-center gap-1 bg-white/20 text-white text-[8px] font-black tracking-wider uppercase px-2 py-0.5 rounded-full">
-                    ● ARCHIVE PLAYBACKS
-                  </span>
-                  <h4 className="font-extrabold text-xs mt-2 truncate">Data Structures Tree Traversals & Recursion</h4>
-                </div>
-                <button 
-                  onClick={() => {
-                    setActiveSession({
-                      id: '1',
-                      title: 'Data Structures Tree Traversals',
-                      courseName: 'Data Structure & Algorithms',
-                      instructor: 'Dr. John Adebayo',
-                      dateTime: new Date().toISOString(),
-                      duration: '60 min',
-                      isLive: true
-                    });
-                  }}
-                  className="w-full bg-white text-crimson font-extrabold text-xs py-2 rounded-xl text-center shadow-lg transition active:scale-95"
-                >
-                  Join Virtual Room Now
-                </button>
-              </div>
-
-              {/* Quick statistics for user roles */}
-              <div className="grid grid-cols-2 gap-3.5 mb-4">
-                <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <span className="text-[9px] text-slate-404 font-bold block">Assigned Tracks</span>
-                  <p className="text-base font-black text-slate-850 dark:text-white mt-1">4 Classes</p>
-                </div>
-                <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <span className="text-[9px] text-slate-404 font-bold block">Perfect attendance</span>
-                  <p className="text-base font-black text-emerald-600 mt-1">94.8% Rate</p>
-                </div>
-              </div>
-
-              {/* Floating micro notification card */}
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 text-[10px] text-indigo-700 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-900/45 font-medium">
-                🔔 Assignment Due: Balance your BST AVL rotatational factors workbook by Friday midnight.
-              </div>
-
-            </div>
-
-            {/* Simulated Smartphone bottom navigation bar */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-850 px-6 py-2.5 flex items-center justify-between">
-              <button onClick={() => { setIsMobileSimulator(false); setCurrentTab('dashboard'); }} className="flex flex-col items-center gap-0.5 text-crimson">
-                <Home size={15} />
-                <span className="text-[8px] font-bold uppercase">Home</span>
-              </button>
-              <button onClick={() => { setIsMobileSimulator(false); setCurrentTab('classes'); }} className="flex flex-col items-center gap-0.5 text-slate-404 hover:text-crimson">
-                <Video size={15} />
-                <span className="text-[8px] font-bold uppercase">Classes</span>
-              </button>
-              <button onClick={() => { setIsMobileSimulator(false); setCurrentTab('chat'); }} className="flex flex-col items-center gap-0.5 text-slate-404 hover:text-crimson">
-                <MessageSquare size={15} />
-                <span className="text-[8px] font-bold uppercase">Chat</span>
-              </button>
-              <button onClick={() => { setIsMobileSimulator(false); setCurrentTab('settings'); }} className="flex flex-col items-center gap-0.5 text-slate-404 hover:text-crimson">
-                <Settings size={15} />
-                <span className="text-[8px] font-bold uppercase">Profile</span>
-              </button>
-            </div>
-            {/* home screen slider swipe bar */}
-            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-28 h-1 bg-slate-900 rounded-full" />
-          </div>
-          <p className="text-center text-xs font-semibold text-slate-400 mt-4 uppercase tracking-wider">Swipe or Tap buttons to return to desktop dashboard</p>
-        </div>
-      ) : (
-        <div id="academy-workspace-layout" className="flex">
+      {/* Main Container - Desktop Workspace Layout (Statically Rendered) */}
+      <div id="academy-workspace-layout" className="flex">
           
           {/* 1. Collapsible Left Navigation Sidebar inside Virtual Classroom */}
           <div 
@@ -723,11 +604,15 @@ export default function VirtualClassroomView({
 
                   <div className="relative max-w-2xl text-left">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black tracking-widest uppercase bg-crimson/30 text-red-200 border border-crimson/20 rounded-full mb-4">
-                      <Sparkles size={13} className="text-red-400" /> Executive Academic Portal Active
+                      <Sparkles size={13} className="text-red-400" /> {isInstructor ? "Executive Academic Portal Active" : "Learner Digital Classroom Portal Active"}
                     </span>
-                    <h2 className="text-2xl md:text-3.5xl font-black tracking-tight leading-none text-white">Welcome, Professor John Adebayo</h2>
+                    <h2 className="text-2xl md:text-3.5xl font-black tracking-tight leading-none text-white">
+                      {isInstructor ? "Welcome, Professor John Adebayo" : "Welcome, Lead Academic Learner"}
+                    </h2>
                     <p className="text-slate-300 text-sm mt-3.5 leading-relaxed font-semibold">
-                      Establish live virtual rooms with advanced AI transcribing systems, track student attendance records, publish minutes digests, and coordinate university core schedules.
+                      {isInstructor 
+                        ? "Establish live virtual rooms with advanced AI transcribing systems, track student attendance records, publish minutes digests, and coordinate university core schedules."
+                        : "Attend scheduled live lectures directly, access real-time AI study companions, complete interactive computer-vision exams, view submissions, and download resource materials."}
                     </p>
 
                     <div className="mt-6 flex flex-wrap gap-2.5">
@@ -742,18 +627,20 @@ export default function VirtualClassroomView({
                             duration: '60 min',
                             isLive: true
                           });
-                          triggerToast("Launching flagship meeting room space...");
+                          triggerToast(isInstructor ? "Launching flagship meeting room space..." : "Connecting to active class laboratory stream...");
                         }}
                         className="px-5 py-2.5 bg-crimson hover:bg-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition"
                       >
-                        Launch Virtual Room
+                        {isInstructor ? "Launch Virtual Room" : "Attend Live Session"}
                       </button>
-                      <button 
-                        onClick={() => setIsCreateModalOpen(true)}
-                        className="px-5 py-2.5 bg-white text-slate-900 font-extrabold text-xs rounded-xl hover:bg-slate-100 transition shadow"
-                      >
-                        Create Virtual Class
-                      </button>
+                      {isInstructor && (
+                        <button 
+                          onClick={() => setIsCreateModalOpen(true)}
+                          className="px-5 py-2.5 bg-white text-slate-900 font-extrabold text-xs rounded-xl hover:bg-slate-100 transition shadow"
+                        >
+                          Create Virtual Class
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -765,7 +652,7 @@ export default function VirtualClassroomView({
                   <div className="md:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-5.5 shadow-sm text-left">
                     <div className="flex justify-between items-center mb-4 border-b border-slate-50 dark:border-slate-800 pb-3">
                       <h3 className="font-extrabold text-sm text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                        <Radio size={14} className="text-crimson animate-pulse" /> Timetable Timeline
+                        <Radio size={14} className="text-crimson animate-pulse" /> {isInstructor ? "Timetable Timeline" : "My Today's Class Timetable"}
                       </h3>
                       <button onClick={() => setCurrentTab('calendar')} className="text-xs font-black text-crimson hover:underline">See Full Calendar</button>
                     </div>
@@ -781,7 +668,7 @@ export default function VirtualClassroomView({
                           onClick={() => setActiveSession({ id: '1', title: 'Data Structures Tree Traversals', courseName: 'Data Structure & Algorithms', instructor: 'Dr. Joseph Adebayo', dateTime: '2026-06-19', duration: '60 min', isLive: true })}
                           className="px-3.5 py-1.5 text-[10px] font-black bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition"
                         >
-                          Join Now
+                          {isInstructor ? "Start Live" : "Join Now"}
                         </button>
                       </div>
 
@@ -795,7 +682,7 @@ export default function VirtualClassroomView({
                           onClick={() => triggerToast("Class is currently scheduled for later today.")}
                           className="px-3.5 py-1.5 text-[10px] font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 hover:bg-slate-100 rounded-lg transition"
                         >
-                          Hold Room
+                          {isInstructor ? "Hold Room" : "Standby"}
                         </button>
                       </div>
                     </div>
@@ -804,26 +691,26 @@ export default function VirtualClassroomView({
                   {/* Core Statistics bento index cards */}
                   <div className="md:col-span-5 grid grid-cols-2 gap-4">
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between shadow-sm text-left">
-                      <span className="text-[10px] text-slate-405 font-bold uppercase">Classes Hosted</span>
-                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">31 Lectures</p>
+                      <span className="text-[10px] text-slate-405 font-bold uppercase">{isInstructor ? "Classes Hosted" : "Classes Attended"}</span>
+                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">{isInstructor ? "31 Lectures" : "18 Lectures"}</p>
                       <span className="text-[9px] text-emerald-600 font-semibold bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full inline-block self-start">+12% speed</span>
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between shadow-sm text-left">
-                      <span className="text-[10px] text-slate-405 font-bold uppercase">Students Attended</span>
-                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">1,842 Total</p>
-                      <span className="text-[9px] text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-950/20 px-2 py-0.5 rounded-full inline-block self-start">Active track</span>
+                      <span className="text-[10px] text-slate-405 font-bold uppercase">{isInstructor ? "Students Attended" : "Attendance Rate"}</span>
+                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">{isInstructor ? "1,842 Total" : "96.4%"}</p>
+                      <span className="text-[9px] text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-950/20 px-2 py-0.5 rounded-full inline-block self-start">{isInstructor ? "Active track" : "Top Tier"}</span>
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between shadow-sm text-left">
                       <span className="text-[10px] text-slate-405 font-bold uppercase">Recordings Vault</span>
                       <p className="text-xl font-black text-slate-850 dark:text-white mt-1">14 Streams</p>
-                      <span className="text-[9px] text-red-600 font-semibold bg-red-50 dark:bg-red-950/20 px-2 py-0.5 rounded-full inline-block self-start">Netflix system</span>
+                      <span className="text-[9px] text-red-600 font-semibold bg-red-50 dark:bg-red-950/20 px-2 py-0.5 rounded-full inline-block self-start">Offline Synced</span>
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between shadow-sm text-left">
-                      <span className="text-[10px] text-slate-405 font-bold uppercase">Teaching Hours</span>
-                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">42.5 hrs</p>
+                      <span className="text-[10px] text-slate-405 font-bold uppercase">{isInstructor ? "Teaching Hours" : "Study Hours"}</span>
+                      <p className="text-xl font-black text-slate-850 dark:text-white mt-1">{isInstructor ? "42.5 hrs" : "28.3 hrs"}</p>
                       <span className="text-[9px] text-amber-600 font-semibold bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 rounded-full inline-block self-start">Completed</span>
                     </div>
                   </div>
@@ -885,13 +772,19 @@ export default function VirtualClassroomView({
                 <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                   <div>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                      <Video className="text-crimson w-5 h-5" /> Virtual Classes Dashboard
+                      <Video className="text-crimson w-5 h-5" /> {isInstructor ? 'Live Broadcast Hub' : 'My Live Lectures Directory'}
                     </h2>
-                    <p className="text-xs text-slate-500 mt-1 shrink-0">Publish recordings, configure core groups, and manage interactive academic video grids.</p>
+                    <p className="text-xs text-slate-500 mt-1 shrink-0">
+                      {isInstructor 
+                        ? 'Publish recordings, configure core groups, and manage interactive academic video grids.' 
+                        : 'Attend scheduled live workshops, participate in Q&As, and download real-time slide notes.'}
+                    </p>
                   </div>
-                  <button onClick={() => setIsCreateModalOpen(true)} className="px-4 py-2 bg-crimson hover:bg-red-700 text-white text-xs font-black rounded-xl shadow transition">
-                    + Create Virtual Class
-                  </button>
+                  {isInstructor && (
+                    <button onClick={() => setIsCreateModalOpen(true)} className="px-4 py-2 bg-crimson hover:bg-red-700 text-white text-xs font-black rounded-xl shadow transition">
+                      + Create Virtual Class
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -904,7 +797,7 @@ export default function VirtualClassroomView({
                           </span>
                           {sess.isLive && (
                             <span className="flex items-center gap-1 text-[8px] font-black text-rose-500 animate-pulse bg-rose-50 px-2 py-0.5 rounded-full border border-rose-320">
-                              ● ACTIVE NOW
+                              ● {isInstructor ? 'LIVE STREAM ACTIVE' : 'LECTURE IS IN SESSION'}
                             </span>
                           )}
                         </div>
@@ -915,15 +808,15 @@ export default function VirtualClassroomView({
                       <div className="mt-5.5 flex gap-2 border-t pt-4 dark:border-slate-800">
                         <button 
                           onClick={() => handleJoinClass(sess)}
-                          className="flex-1 bg-crimson hover:bg-red-700 text-white text-xs font-black py-2 rounded-lg transition"
+                          className="flex-1 bg-crimson hover:bg-red-700 text-white text-xs font-black py-2 rounded-lg transition animate-pulse"
                         >
-                          Launch Room
+                          {isInstructor ? 'Launch Broadcast Room' : 'Enter Live Stream'}
                         </button>
                         <button 
-                          onClick={() => triggerToast(`Evaluating analytics report for ${sess.title}...`)}
+                          onClick={() => triggerToast(isInstructor ? `Evaluating analytics report for ${sess.title}...` : `Preparing AI study study workbook for ${sess.title}...`)}
                           className="px-3 bg-slate-50 hover:bg-slate-100 text-slate-650 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 text-xs font-bold rounded-lg transition"
                         >
-                          Analytics
+                          {isInstructor ? 'Analytics' : 'Study Aids'}
                         </button>
                       </div>
                     </div>
@@ -962,9 +855,13 @@ export default function VirtualClassroomView({
               <div className="space-y-6 text-left">
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                   <h2 className="text-xl font-bold dark:text-white flex items-center gap-2">
-                    <BookOpenCheck className="text-crimson w-5 h-5" /> Exams & Academic Quizzes
+                    <BookOpenCheck className="text-crimson w-5 h-5" /> {isInstructor ? 'Exams & Academic Quizzes' : 'My Exams & Proctored Assessments'}
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">Design automated assessments, configure real-time AI-proctoring alerts, and audit score thresholds.</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {isInstructor 
+                      ? 'Design automated assessments, configure real-time AI-proctoring alerts, and audit score thresholds.'
+                      : 'Complete assigned quizzes under high-integrity conditions. Your microphone and webcam tokens are matched before joining.'}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -978,54 +875,94 @@ export default function VirtualClassroomView({
                     <p className="text-xs text-slate-500 leading-normal">Requires active webcam, automatic tab-switch locking, and AI facial proctor analytics.</p>
                     
                     <div className="flex gap-2.5 pt-2">
-                      <button onClick={() => triggerToast("Simulating Midterm exam initialization...")} className="flex-1 bg-crimson text-white hover:bg-red-700 text-xs font-black py-2 rounded-lg transition">
-                        Initialize Exam Room
+                      <button 
+                        onClick={() => triggerToast(isInstructor ? "Simulating Midterm exam initialization..." : "Launching Proctored Examination block... Keep screen active.")} 
+                        className="flex-1 bg-crimson text-white hover:bg-red-700 text-xs font-black py-2 rounded-lg transition"
+                      >
+                        {isInstructor ? 'Initialize Exam Room' : 'Begin Exam with Proctoring'}
                       </button>
-                      <button onClick={() => triggerToast("Configurations saved.")} className="px-3 border text-slate-550' dark:text-slate-300 dark:hover:bg-slate-800 text-xs font-bold rounded-lg transition">
-                        Config
-                      </button>
+                      {isInstructor && (
+                        <button onClick={() => triggerToast("Configurations saved.")} className="px-3 border text-slate-550 dark:text-slate-300 dark:hover:bg-slate-800 text-xs font-bold rounded-lg transition">
+                          Config
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* AI Proctoring Controls Widget */}
-                  <div className="bg-slate-900 rounded-2xl p-5 text-white space-y-4">
-                    <h4 className="font-black text-xs text-red-400 uppercase tracking-widest flex items-center gap-1">
-                      <Shield size={14} /> AI Proctoring Center Setup
-                    </h4>
-                    
-                    <div className="grid grid-cols-1 gap-2 border-t border-slate-800 pt-3 text-xs">
-                      <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
-                        <span>Detect multiple faces simultaneously</span>
-                        <input 
-                          type="checkbox" 
-                          checked={proctoringFlags.faceCountFlag} 
-                          onChange={() => setProctoringFlags(prev => ({ ...prev, faceCountFlag: !prev.faceCountFlag }))} 
-                        />
-                      </label>
+                  {isInstructor ? (
+                    /* AI Proctoring Controls Widget for Instructors */
+                    <div className="bg-slate-900 rounded-2xl p-5 text-white space-y-4">
+                      <h4 className="font-black text-xs text-red-400 uppercase tracking-widest flex items-center gap-1">
+                        <Shield size={14} /> AI Proctoring Center Setup
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 gap-2 border-t border-slate-800 pt-3 text-xs">
+                        <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
+                          <span>Detect multiple faces simultaneously</span>
+                          <input 
+                            type="checkbox" 
+                            checked={proctoringFlags.faceCountFlag} 
+                            onChange={() => setProctoringFlags(prev => ({ ...prev, faceCountFlag: !prev.faceCountFlag }))} 
+                          />
+                        </label>
 
-                      <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
-                        <span>Flag window/tab switching actions</span>
-                        <input 
-                          type="checkbox" 
-                          checked={proctoringFlags.tabSwitchFlag} 
-                          onChange={() => setProctoringFlags(prev => ({ ...prev, tabSwitchFlag: !prev.tabSwitchFlag }))} 
-                        />
-                      </label>
+                        <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
+                          <span>Flag window/tab switching actions</span>
+                          <input 
+                            type="checkbox" 
+                            checked={proctoringFlags.tabSwitchFlag} 
+                            onChange={() => setProctoringFlags(prev => ({ ...prev, tabSwitchFlag: !prev.tabSwitchFlag }))} 
+                          />
+                        </label>
 
-                      <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
-                        <span>Background voice threshold warning</span>
-                        <input 
-                          type="checkbox" 
-                          checked={proctoringFlags.noiseFlag} 
-                          onChange={() => setProctoringFlags(prev => ({ ...prev, noiseFlag: !prev.noiseFlag }))} 
-                        />
-                      </label>
+                        <label className="flex items-center justify-between cursor-pointer p-2 rounded hover:bg-slate-800">
+                          <span>Background voice threshold warning</span>
+                          <input 
+                            type="checkbox" 
+                            checked={proctoringFlags.noiseFlag} 
+                            onChange={() => setProctoringFlags(prev => ({ ...prev, noiseFlag: !prev.noiseFlag }))} 
+                          />
+                        </label>
+                      </div>
+
+                      <p className="text-[9px] text-slate-400 font-semibold leading-relaxed">
+                        AI Proctoring automatically flags suspicious browser movements and records webcam snapshots recursively.
+                      </p>
                     </div>
-
-                    <p className="text-[9px] text-slate-400 font-semibold leading-relaxed">
-                      AI Proctoring automatically flags suspicious browser movements and records webcam snapshots recursively.
-                    </p>
-                  </div>
+                  ) : (
+                    /* Device Web Matching widget for Students */
+                    <div className="bg-slate-900 rounded-2xl p-5 text-white space-y-4">
+                      <h4 className="font-black text-xs text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <Shield size={14} className="text-emerald-400" /> Active Device Integrity Check
+                      </h4>
+                      <p className="text-[10px] text-slate-300">Matching tokens for FaceID pre-verification liveness checks before loading exam sheets.</p>
+                      
+                      <div className="space-y-2.5 border-t border-slate-800 pt-3.5 text-xs">
+                        <div className="flex items-center justify-between bg-slate-950/40 p-2 rounded border border-emerald-500/20">
+                          <span className="font-medium text-slate-300">Local Camera Telemetry</span>
+                          <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Verified Active
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between bg-slate-950/40 p-2 rounded border border-emerald-500/20">
+                          <span className="font-medium text-slate-300">Biometric Liveness Match</span>
+                          <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> 99.8% Matched
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between bg-slate-950/40 p-2 rounded border border-emerald-500/20">
+                          <span className="font-medium text-slate-300">Tab Switch Lock Shield</span>
+                          <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Engaged
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-[9px] text-slate-405 leading-relaxed font-semibold">
+                        System telemetry certified by the Microsoft Academic Integrity framework matching tokens live.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1654,7 +1591,6 @@ export default function VirtualClassroomView({
           </div>
 
         </div>
-      )}
 
       {/* 3. Create Class Modal */}
       <AnimatePresence>

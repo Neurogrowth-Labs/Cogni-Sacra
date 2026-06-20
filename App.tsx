@@ -43,10 +43,13 @@ import TermsOfServiceView from './components/TermsOfServiceView';
 import SubscriptionView from './components/SubscriptionView';
 import AIToolsView from './components/AIToolsView';
 import VirtualClassroomView from './components/VirtualClassroomView';
+import { InstitutionPortalView } from './components/InstitutionPortalView';
 import LandingPage from './components/landing/LandingPage';
 import { supabase } from './services/supabaseClient';
+import VirtualLibraryView from './components/VirtualLibraryView';
+import CogniSacraInstitutionalLibraryView from './components/CogniSacraInstitutionalLibraryView';
 
-type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class';
+type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
@@ -859,6 +862,10 @@ const App: React.FC = () => {
                 return <TermsOfServiceView />;
             case 'ai-tools':
                 return <AIToolsView />;
+            case 'library':
+                return userRole === 'institution' ? <CogniSacraInstitutionalLibraryView /> : <VirtualLibraryView userRole={userRole} />;
+            case 'institution-portal':
+                return <InstitutionPortalView institutionData={institutionData} />;
             case 'virtual-class':
                 return (
                     <VirtualClassroomView 

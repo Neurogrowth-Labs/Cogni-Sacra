@@ -35,6 +35,8 @@ export const translations: { [langCode: string]: { [key: string]: string } } = {
     'Legal': 'Legal',
     'Data Policy': 'Política de Datos',
     'Terms of Service': 'Términos de Servicio',
+    'Attend Class': 'Asistir a Clase',
+    'Portal': 'Portal',
   },
   fr: {
     'Dashboard': 'Tableau de bord',
@@ -50,7 +52,7 @@ export const translations: { [langCode: string]: { [key: string]: string } } = {
     'My Certificates': 'Mes Certificats',
     'View your achievements': 'Voir vos réalisations',
     'Saved Courses': 'Cours Enregistrés',
-    'Your personal wishlist': 'Votre liste de souhaits personnelle',
+    'Your personal wishlist': 'Votre lista de souhaits personnelle',
     'Continue Your Journey': 'Continuez Votre Parcours',
     'Explore Courses': 'Explorer les Cours',
     'Find the perfect course to kickstart your learning journey.': "Trouvez le cours parfait pour démarrer votre parcours d'apprentissage.",
@@ -72,6 +74,8 @@ export const translations: { [langCode: string]: { [key: string]: string } } = {
     'Legal': 'Légal',
     'Data Policy': 'Politique de Données',
     'Terms of Service': "Conditions d'Utilisation",
+    'Attend Class': 'Assister au Cours',
+    'Portal': 'Portail',
   },
   sw: {
     'Dashboard': 'Dashibodi',
@@ -89,6 +93,8 @@ export const translations: { [langCode: string]: { [key: string]: string } } = {
     'Legal': 'Kisheria',
     'Data Policy': 'Sera ya Data',
     'Terms of Service': 'Masharti ya Huduma',
+    'Attend Class': 'Hudhuria Darasa',
+    'Portal': 'Lango',
   },
   zh: {
     'Dashboard': '仪表板',
@@ -106,5 +112,7 @@ export const translations: { [langCode: string]: { [key: string]: string } } = {
     'Legal': '法律',
     'Data Policy': '数据政策',
     'Terms of Service': '服务条款',
+    'Attend Class': '参加班级',
+    'Portal': '门户',
   }
 };

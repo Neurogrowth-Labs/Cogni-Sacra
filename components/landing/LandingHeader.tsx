@@ -20,10 +20,10 @@ const NavLink: React.FC<{
 }> = ({ view, current, setView, children, isMobile = false }) => (
     <button
         onClick={() => setView(view)}
-        className={`${isMobile ? 'block w-full text-left px-3 py-2 rounded-md text-base font-medium' : 'px-3 py-2 rounded-md text-sm font-semibold'} ${
+        className={`${isMobile ? 'block w-full text-left px-4 py-2 text-base font-semibold' : 'px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider uppercase transition-all duration-305'} ${
             current === view
-                ? 'bg-crimson/10 text-crimson dark:bg-crimson/20 dark:text-red-300'
-                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
+                ? 'bg-red-50 text-red-600 border border-red-200/60 shadow-[0_2px_12px_rgba(239,68,68,0.08)]'
+                : 'text-slate-600 hover:text-red-600 hover:bg-slate-50'
         }`}
     >
         {children}
@@ -43,47 +43,53 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
     ];
 
     return (
-        <header className="absolute top-0 left-0 right-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-rose-100/60 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    <div className="flex-shrink-0 flex items-center space-x-2 cursor-pointer" onClick={() => setView('home')}>
-                        <CogniSacraLogo className="w-8 h-8" />
-                        <span className="font-bold text-xl font-serif">EmpowerAfriq Academy</span>
+                <div className="flex justify-between items-center h-20">
+                    <div className="flex-shrink-0 flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
+                        <div className="p-1.5 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl shadow-[0_4px_15px_rgba(239,68,68,0.2)]">
+                            <CogniSacraLogo className="w-8 h-8 text-white" />
+                        </div>
+                        <span className="font-extrabold text-lg sm:text-xl font-sans tracking-wider text-slate-900 flex items-center gap-1">
+                            CogniSacra<span className="text-red-600">™</span>
+                        </span>
                     </div>
-                    <div className="hidden md:flex md:items-center md:space-x-4">
+                    <div className="hidden md:flex md:items-center md:space-x-1.5 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/50">
                         {navItems.map(item => (
                             <NavLink key={item.view} view={item.view} current={currentView} setView={setView}>
                                 {item.label}
                             </NavLink>
                         ))}
-                         <button onClick={onGetStarted} className="ml-4 px-5 py-2 text-sm font-semibold text-white bg-crimson rounded-full hover:bg-red-800 transition-colors">
+                    </div>
+                    <div className="hidden md:flex items-center space-x-3">
+                         <button onClick={onGetStarted} className="px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-650 to-red-500 hover:from-red-500 hover:to-red-650 rounded-full shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-[0_6px_25px_rgba(239,68,68,0.4)] transition-all duration-300 transform hover:-translate-y-0.5">
                             Sign In
-                        </button>
+                         </button>
                     </div>
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             type="button"
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+                            className="inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-slate-50 focus:outline-none"
                             aria-controls="mobile-menu"
                             aria-expanded={isMobileMenuOpen}
                         >
                             <span className="sr-only">Open main menu</span>
-                            {isMobileMenuOpen ? <XMarkIcon className="block h-6 w-6" /> : <MenuIcon className="block h-6 w-6" />}
+                            {isMobileMenuOpen ? <XMarkIcon className="block h-6 w-6 text-slate-800" /> : <MenuIcon className="block h-6 w-6 text-slate-800" />}
                         </button>
                     </div>
                 </div>
             </div>
             
             {isMobileMenuOpen && (
-                <div className="md:hidden" id="mobile-menu">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <div className="md:hidden bg-white/95 border-b border-rose-100 backdrop-blur-lg" id="mobile-menu">
+                    <div className="px-2 pt-2 pb-6 space-y-1 sm:px-3 text-center">
                          {navItems.map(item => (
                             <NavLink key={item.view} view={item.view} current={currentView} setView={(v) => { setView(v); setIsMobileMenuOpen(false); }} isMobile>
                                 {item.label}
                             </NavLink>
                         ))}
-                         <button onClick={onGetStarted} className="mt-2 w-full text-left block px-3 py-2 rounded-md text-base font-medium text-white bg-crimson">
+                         <button onClick={onGetStarted} className="mt-4 w-11/12 ml-auto mr-auto block px-4 py-3 rounded-full text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-red-500">
                             Sign In
                         </button>
                     </div>

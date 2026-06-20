@@ -1,26 +1,27 @@
 
 import React from 'react';
-import HomeIcon from './icons/HomeIcon';
-import BookOpenIcon from './icons/BookOpenIcon';
-import SparklesIcon from './icons/SparklesIcon';
-import ChevronLeftIcon from './icons/ChevronLeftIcon';
-import TrophyIcon from './icons/TrophyIcon';
-import BriefcaseIcon from './icons/BriefcaseIcon';
 import { UserRole } from '../types';
-import CogIcon from './icons/CogIcon';
-import UsersIcon from './icons/UsersIcon';
-import ChartBarIcon from './icons/ChartBarIcon';
-import GlobeAltIcon from './icons/GlobeAltIcon';
-import CalendarIcon from './icons/CalendarIcon';
 import { useTranslation } from '../hooks/useTranslation';
-import BuildingLibraryIcon from './icons/BuildingLibraryIcon';
-import InformationCircleIcon from './icons/InformationCircleIcon';
-import EnvelopeIcon from './icons/EnvelopeIcon';
 import CogniSacraLogo from './icons/IntelliLearnLogo';
-import SignalIcon from './icons/SignalIcon';
-import { Video } from 'lucide-react';
+import { 
+    Home, 
+    Calendar, 
+    Video, 
+    Globe, 
+    Sparkles, 
+    Trophy, 
+    Briefcase, 
+    BookOpen, 
+    BarChart3, 
+    Settings, 
+    Building2, 
+    Users, 
+    Info, 
+    Mail, 
+    ChevronLeft 
+} from 'lucide-react';
 
-type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class';
+type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -48,7 +49,7 @@ const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolea
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
         >
             <span className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</span>
-            <span className={`ml-4 font-medium whitespace-nowrap transition-all duration-300 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 overflow-hidden'}`}>
+            <span className={`ml-4 font-medium whitespace-nowrap transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 -translate-x-4 w-0 overflow-hidden'}`}>
                 {translatedLabel}
             </span>
             {/* Tooltip for collapsed state */}
@@ -70,46 +71,60 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
     const learnerNav = (
         <>
             <NavItem
-                icon={<HomeIcon />}
+                icon={<Home size={20} />}
                 label="Dashboard"
                 isActive={currentView === 'dashboard' || currentView === 'course'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('dashboard')}
             />
             <NavItem
-                icon={<CalendarIcon />}
+                icon={<Calendar size={20} />}
                 label="Calendar"
                 isActive={currentView === 'calendar'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('calendar')}
             />
             <NavItem
-                icon={<GlobeAltIcon />}
+                icon={<Video size={20} />}
+                label="Attend Class"
+                isActive={currentView === 'virtual-class'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('virtual-class')}
+            />
+            <NavItem
+                icon={<Globe size={20} />}
                 label="Community"
                 isActive={currentView === 'community'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('community')}
             />
             <NavItem
-                icon={<SparklesIcon />}
+                icon={<Sparkles size={20} />}
                 label="AI Tutor"
                 isActive={currentView === 'tutor'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('tutor')}
             />
             <NavItem
-                icon={<TrophyIcon />}
+                icon={<Trophy size={20} />}
                 label="Achievements"
                 isActive={currentView === 'profile'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('profile')}
             />
             <NavItem
-                icon={<BriefcaseIcon />}
+                icon={<Briefcase size={20} />}
                 label="Career Hub"
                 isActive={currentView === 'jobs'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('jobs')}
+            />
+            <NavItem
+                icon={<BookOpen size={20} />}
+                label="Virtual Library"
+                isActive={currentView === 'library'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('library')}
             />
         </>
     );
@@ -117,49 +132,56 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
     const instructorNav = (
          <>
             <NavItem
-                icon={<HomeIcon />}
+                icon={<Home size={20} />}
                 label="Dashboard"
                 isActive={currentView === 'instructor-dashboard' || currentView === 'course-builder' || currentView === 'course'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('instructor-dashboard')}
             />
              <NavItem
-                icon={<GlobeAltIcon />}
+                icon={<Globe size={20} />}
                 label="Community"
                 isActive={currentView === 'community'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('community')}
             />
             <NavItem
-                icon={<BookOpenIcon />}
+                icon={<BookOpen size={20} />}
                 label="My Courses"
                 isActive={false} 
                 isOpen={isOpen}
                 onClick={() => onNavigate('instructor-dashboard')}
             />
             <NavItem
-                icon={<ChartBarIcon />}
+                icon={<BookOpen size={20} />}
+                label="Virtual Library"
+                isActive={currentView === 'library'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('library')}
+            />
+            <NavItem
+                icon={<BarChart3 size={20} />}
                 label="Analytics"
                 isActive={currentView === 'instructor-analytics'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('instructor-analytics')}
             />
             <NavItem
-                icon={<CalendarIcon />}
+                icon={<Calendar size={20} />}
                 label="Calendar"
                 isActive={currentView === 'calendar'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('calendar')}
             />
             <NavItem
-                icon={<SparklesIcon />}
+                icon={<Sparkles size={20} />}
                 label="AI Architect"
                 isActive={currentView === 'tutor'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('tutor')}
             />
             <NavItem
-                icon={<CogIcon />}
+                icon={<Settings size={20} />}
                 label="Settings"
                 isActive={currentView === 'instructor-settings'}
                 isOpen={isOpen}
@@ -171,7 +193,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
     const institutionNav = (
          <>
             <NavItem
-                icon={<ChartBarIcon />}
+                icon={<BarChart3 size={20} />}
                 label="Analytics"
                 isActive={currentView === 'institution-dashboard'}
                 isOpen={isOpen}
@@ -180,26 +202,33 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
             <NavItem
                 icon={<Video size={20} />}
                 label="Portal"
-                isActive={currentView === 'virtual-class'}
+                isActive={currentView === 'institution-portal'}
                 isOpen={isOpen}
-                onClick={() => onNavigate('virtual-class')}
+                onClick={() => onNavigate('institution-portal')}
             />
-             <NavItem
-                icon={<BuildingLibraryIcon />}
+            <NavItem
+                icon={<BookOpen size={20} />}
+                label="Academy Library"
+                isActive={currentView === 'library'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('library')}
+            />
+            <NavItem
+                icon={<Building2 size={20} />}
                 label="Profile"
                 isActive={currentView === 'institution-profile' || currentView === 'institution-profile-editing'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('institution-profile')}
             />
             <NavItem
-                icon={<UsersIcon />}
+                icon={<Users size={20} />}
                 label="Team"
                 isActive={currentView === 'institution-learners'}
                 isOpen={isOpen}
                 onClick={() => onNavigate('institution-learners')}
             />
             <NavItem
-                icon={<CogIcon />}
+                icon={<Settings size={20} />}
                 label="Settings"
                 isActive={currentView === 'institution-settings'}
                 isOpen={isOpen}
@@ -210,13 +239,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
     
     const aiSuiteNav = (
         <>
-            <NavItem
-                icon={<SparklesIcon />}
-                label="AI Tools"
-                isActive={currentView === 'ai-tools'}
-                isOpen={isOpen}
-                onClick={() => onNavigate('ai-tools')}
-            />
+            {userRole !== 'learner' && (
+                <NavItem
+                    icon={<Sparkles size={20} />}
+                    label="AI Tools"
+                    isActive={currentView === 'ai-tools'}
+                    isOpen={isOpen}
+                    onClick={() => onNavigate('ai-tools')}
+                />
+            )}
             {userRole === 'instructor' && (
                 <NavItem
                     icon={<Video size={20} />}
@@ -254,7 +285,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                     </div>
                 )}
                  <button onClick={() => setSidebarOpen(!isOpen)} className={`hidden lg:block p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-transform duration-300 ${isOpen ? '' : 'rotate-180 absolute right-[-12px] top-8 bg-white dark:bg-gray-800 shadow-md border dark:border-gray-700'}`} aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}>
-                    <ChevronLeftIcon className="w-5 h-5" />
+                    <ChevronLeft size={20} />
                 </button>
             </div>
 
@@ -264,28 +295,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                         {renderNav()}
                     </ul>
 
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-4"></div>
-                    
-                    <p className={`px-4 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
-                        {aiSuiteText}
-                    </p>
-                    <ul>
-                        {aiSuiteNav}
-                    </ul>
+                    {userRole !== 'learner' && (
+                        <>
+                            <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-4"></div>
+                            
+                            <p className={`px-4 mb-2 text-xs font-bold text-gray-400 uppercase tracking-widest transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                                {aiSuiteText}
+                            </p>
+                            <ul>
+                                {aiSuiteNav}
+                            </ul>
+                        </>
+                    )}
                 </div>
 
                 <div>
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-4"></div>
                     <ul>
                         <NavItem
-                            icon={<InformationCircleIcon />}
+                            icon={<Info size={20} />}
                             label="About Us"
                             isActive={currentView === 'about'}
                             isOpen={isOpen}
                             onClick={() => onNavigate('about')}
                         />
                             <NavItem
-                            icon={<EnvelopeIcon />}
+                            icon={<Mail size={20} />}
                             label="Contact"
                             isActive={currentView === 'contact'}
                             isOpen={isOpen}
