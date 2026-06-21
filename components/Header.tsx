@@ -30,10 +30,11 @@ interface HeaderProps {
 
 const languages = [
     { code: 'en', name: 'English' },
+    { code: 'pt', name: 'Português' },
     { code: 'es', name: 'Español' },
     { code: 'fr', name: 'Français' },
+    { code: 'ar', name: 'العربية' },
     { code: 'sw', name: 'Kiswahili' },
-    { code: 'zh', name: '中文' },
 ];
 
 type NotificationType = 'achievement' | 'reminder' | 'mention';
@@ -177,9 +178,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, userRole, onLogout, on
                     </div>
 
                     {/* Language Selector */}
-                    <div className="relative hidden sm:block" ref={langMenuRef}>
-                        <button onClick={() => setLangDropdownOpen(!isLangDropdownOpen)} className="p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-600 dark:text-gray-300" aria-label={`Select language`}>
-                            <GlobeAltIcon className="w-6 h-6"/>
+                    <div className="relative block" ref={langMenuRef}>
+                        <button onClick={() => setLangDropdownOpen(!isLangDropdownOpen)} className="p-2 sm:p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-gray-600 dark:text-gray-300 flex items-center gap-1 sm:gap-1.5" aria-label={`Select language. Current is ${selectedLang.name}`}>
+                            <GlobeAltIcon className="w-5 h-5 sm:w-6 sm:h-6"/>
+                            <span className="text-[11px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50">{selectedLang.code}</span>
                         </button>
                         {isLangDropdownOpen && (
                             <div className="absolute right-0 mt-4 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl py-2 z-50 ring-1 ring-black ring-opacity-5 animate-fade-in origin-top-right border border-gray-100 dark:border-gray-700">

@@ -11,7 +11,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
     return (
         <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
             <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
-                <p className="text-sm text-gray-400 dark:text-gray-500">&copy; {new Date().getFullYear()} EmpowerAfriq Academy. All rights reserved.</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">&copy; {new Date().getFullYear()} CogniSacra Academy. All rights reserved.</p>
                 <div className="flex space-x-6 mt-4 sm:mt-0">
                     <button onClick={() => onNavigate('contact')} className="text-sm text-gray-500 hover:text-crimson transition-colors">Contact</button>
                     <button onClick={() => onNavigate('data-policy')} className="text-sm text-gray-500 hover:text-crimson transition-colors">Privacy</button>

@@ -108,7 +108,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                             <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
                                 <CogniSacraLogo className="w-8 h-8" />
                             </div>
-                            <span className="text-2xl font-bold text-white font-serif tracking-tight">EmpowerAfriq Academy</span>
+                            <span className="text-2xl font-bold text-white font-serif tracking-tight">CogniSacra Academy</span>
                         </div>
                     </div>
 

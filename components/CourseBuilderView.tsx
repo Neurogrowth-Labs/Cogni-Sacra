@@ -29,6 +29,51 @@ const CourseBuilderView: React.FC<CourseBuilderViewProps> = ({ initialCourse, on
     });
     const [expandedLessonId, setExpandedLessonId] = useState<string | null>(null);
 
+    const [videoSourceType, setVideoSourceType] = useState<'upload' | 'youtube'>(
+        initialCourse.videoTrailerUrl && (initialCourse.videoTrailerUrl.includes('youtube') || initialCourse.videoTrailerUrl.includes('youtu.be'))
+        ? 'youtube'
+        : (initialCourse.videoTrailerUrl ? 'upload' : 'youtube')
+    );
+    const [isDragging, setIsDragging] = useState(false);
+    const [uploadedFileName, setUploadedFileName] = useState(
+        initialCourse.videoTrailerUrl && !(initialCourse.videoTrailerUrl.includes('youtube') || initialCourse.videoTrailerUrl.includes('youtu.be'))
+        ? initialCourse.videoTrailerUrl.split('/').pop() || 'uploaded_video.mp4'
+        : ''
+    );
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('video/')) {
+                setUploadedFileName(file.name);
+                setCourse(prev => ({ ...prev, videoTrailerUrl: 'https://www.youtube.com/watch?v=Ke90Tje7VS0' }));
+            } else {
+                alert('Please upload a valid video file.');
+            }
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            setUploadedFileName(file.name);
+            setCourse(prev => ({ ...prev, videoTrailerUrl: 'https://www.youtube.com/watch?v=Ke90Tje7VS0' }));
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         if (name === "priceType") {
@@ -127,23 +172,140 @@ const CourseBuilderView: React.FC<CourseBuilderViewProps> = ({ initialCourse, on
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="imageUrl" className="block text-sm font-medium">Image URL</label>
+                                    <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Image URL</label>
                                     <input type="url" name="imageUrl" id="imageUrl" value={course.imageUrl} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm dark:bg-gray-700 dark:border-gray-600 focus:border-crimson focus:ring-crimson" />
                                 </div>
                                 <div>
-                                    <label htmlFor="level" className="block text-sm font-medium">Difficulty Level</label>
+                                    <label htmlFor="level" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Difficulty Level</label>
                                     <select name="level" id="level" value={course.level} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm dark:bg-gray-700 dark:border-gray-600 focus:border-crimson focus:ring-crimson">
                                         <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
                                     </select>
                                 </div>
                                 {userRole === 'institution' && faculty && (
                                     <div className="md:col-span-2">
-                                        <label htmlFor="instructor" className="block text-sm font-medium">Instructor</label>
+                                        <label htmlFor="instructor" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Instructor</label>
                                         <select name="instructor" id="instructor" value={course.instructor} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm dark:bg-gray-700 dark:border-gray-600 focus:border-crimson focus:ring-crimson">
                                             {faculty.map(f => <option key={f.id} value={f.name}>{f.name}</option>)}
                                         </select>
                                     </div>
                                 )}
+
+                                <div className="md:col-span-2">
+                                    <label htmlFor="coursePublishOption" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Publishing Option & Status</label>
+                                    <select 
+                                        name="coursePublishOption" 
+                                        id="coursePublishOption"
+                                        value={
+                                            course.statusLabel === 'Coming Soon' || course.status === 'upcoming' ? 'coming-soon' :
+                                            course.statusLabel === 'Archived' || course.status === 'archived' ? 'archived' :
+                                            course.statusLabel === 'Online' ? 'online' : 'self-paced'
+                                        } 
+                                        onChange={(e) => {
+                                            const opt = e.target.value;
+                                            if (opt === 'coming-soon') {
+                                                setCourse(prev => ({ ...prev, status: 'upcoming', statusLabel: 'Coming Soon' }));
+                                            } else if (opt === 'archived') {
+                                                setCourse(prev => ({ ...prev, status: 'archived', statusLabel: 'Archived' }));
+                                            } else if (opt === 'online') {
+                                                setCourse(prev => ({ ...prev, status: 'active', statusLabel: 'Online' }));
+                                            } else {
+                                                setCourse(prev => ({ ...prev, status: 'active', statusLabel: 'Self-Paced' }));
+                                            }
+                                        }} 
+                                        className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm dark:bg-gray-700 dark:border-gray-600 focus:border-crimson focus:ring-crimson"
+                                    >
+                                        <option value="self-paced">Self-Paced (Emerald Green badging)</option>
+                                        <option value="online">Online (Royal Blue badging - Online live courses)</option>
+                                        <option value="archived">Archived (Slate Gray badging - Reference only)</option>
+                                        <option value="coming-soon">Coming Soon (Schedule as Coming Soon)</option>
+                                    </select>
+                                </div>
+
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Course Trailer Video</label>
+                                    <div className="flex rounded-md shadow-sm">
+                                        <button
+                                            type="button"
+                                            onClick={() => setVideoSourceType('youtube')}
+                                            className={`w-1/2 py-2 text-xs font-semibold border rounded-l-md transition-all ${
+                                                videoSourceType === 'youtube'
+                                                ? 'bg-crimson text-white border-crimson'
+                                                : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            Paste YouTube Video Link
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setVideoSourceType('upload')}
+                                            className={`w-1/2 py-2 text-xs font-semibold border border-l-0 rounded-r-md transition-all ${
+                                                videoSourceType === 'upload'
+                                                ? 'bg-crimson text-white border-crimson'
+                                                : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                            }`}
+                                        >
+                                            Drag & Drop / Upload Video File
+                                        </button>
+                                    </div>
+
+                                    {videoSourceType === 'youtube' ? (
+                                        <div>
+                                            <input
+                                                type="url"
+                                                name="videoTrailerUrl"
+                                                id="videoTrailerUrl"
+                                                value={course.videoTrailerUrl || ''}
+                                                onChange={handleChange}
+                                                placeholder="e.g., https://www.youtube.com/watch?v=Ke90Tje7VS0"
+                                                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm dark:bg-gray-700 dark:border-gray-600 focus:border-crimson focus:ring-crimson"
+                                            />
+                                            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Provide a watch or embed link to the course video trailer.</p>
+                                        </div>
+                                    ) : (
+                                        <div 
+                                            onDragOver={handleDragOver}
+                                            onDragLeave={handleDragLeave}
+                                            onDrop={handleDrop}
+                                            className={`border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center transition-all ${
+                                                isDragging 
+                                                ? 'border-crimson bg-crimson/5 dark:bg-crimson/10 scale-98' 
+                                                : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-gray-50/50 dark:bg-gray-800/10'
+                                            }`}
+                                        >
+                                            <input 
+                                                type="file" 
+                                                id="course-video-upload" 
+                                                accept="video/*" 
+                                                className="hidden" 
+                                                onChange={handleFileChange}
+                                            />
+                                            <div htmlFor="course-video-upload" className="flex flex-col items-center justify-center text-center space-y-1">
+                                                <span className="text-3xl">🎥</span>
+                                                <label htmlFor="course-video-upload" className="text-sm font-semibold text-crimson dark:text-red-400 hover:underline cursor-pointer">
+                                                    {uploadedFileName ? 'Change uploaded video' : 'Browse and select video file'}
+                                                </label>
+                                                <span className="text-xs text-gray-500 dark:text-gray-400">or drop your video file here</span>
+                                            </div>
+                                            {uploadedFileName && (
+                                                <div className="mt-3 p-2 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 text-xs rounded border border-green-200/50 flex items-center gap-1.5 animate-fade-in">
+                                                    <span>✓</span>
+                                                    <span className="font-semibold truncate max-w-[200px]">{uploadedFileName}</span>
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setUploadedFileName('');
+                                                            setCourse(prev => ({ ...prev, videoTrailerUrl: '' }));
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 font-bold ml-1 active:scale-95"
+                                                    >
+                                                        [Remove]
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -164,6 +164,10 @@ const ProfileEditingView: React.FC<ProfileEditingViewProps> = ({ userProfile, on
                         <input type="text" name="username" id="username" value={profile.username} onChange={handleInputChange} className="mt-1 block w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
                     </div>
                     <div>
+                        <label htmlFor="academicInstitution" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Enrolled Academic Institution (Required for Financial Aid Eligibility)</label>
+                        <input type="text" name="academicInstitution" id="academicInstitution" value={profile.academicInstitution || ''} onChange={handleInputChange} placeholder="e.g. State University, Tech University" className="mt-1 block w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm focus:ring-crimson focus:border-crimson" />
+                    </div>
+                    <div>
                         <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
                         <textarea name="bio" id="bio" value={profile.bio} onChange={handleInputChange} rows={4} className="mt-1 block w-full rounded-md dark:bg-gray-700 border-gray-300 dark:border-gray-600 shadow-sm" />
                     </div>

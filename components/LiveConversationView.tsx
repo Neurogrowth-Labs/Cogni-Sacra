@@ -142,17 +142,16 @@ const LiveConversationView: React.FC = () => {
                         }
 
                         // Handle transcriptions
-                        if(message.serverContent?.inputTranscription) {
-                            setCurrentInterimTranscript(currentInput + message.serverContent.inputTranscription.text);
+                        if (message.serverContent?.inputTranscription?.text) {
+                            currentInput += message.serverContent.inputTranscription.text;
+                            setCurrentInterimTranscript(currentInput);
                         }
-                        if(message.serverContent?.outputTranscription) {
-                            // You can handle interim output transcription here if needed
+                        if (message.serverContent?.outputTranscription?.text) {
+                            currentOutput += message.serverContent.outputTranscription.text;
                         }
                         if (message.serverContent?.turnComplete) {
-                            const inputTranscription = message.serverContent?.turnComplete.inputTranscription;
-                            const outputTranscription = message.serverContent?.turnComplete.outputTranscription;
-                            if (inputTranscription && outputTranscription) {
-                                setTranscripts(prev => [...prev, {user: inputTranscription.text, model: outputTranscription.text}]);
+                            if (currentInput || currentOutput) {
+                                setTranscripts(prev => [...prev, { user: currentInput, model: currentOutput }]);
                                 currentInput = '';
                                 currentOutput = '';
                                 setCurrentInterimTranscript('');

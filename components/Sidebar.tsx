@@ -18,17 +18,25 @@ import {
     Users, 
     Info, 
     Mail, 
-    ChevronLeft 
+    ChevronLeft,
+    Brain,
+    Network,
+    Compass,
+    Database,
+    Film,
+    ShoppingCart,
+    Award
 } from 'lucide-react';
 
 type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library';
 
 interface SidebarProps {
     isOpen: boolean;
-    onNavigate: (view: NavView) => void;
+    onNavigate: (view: NavView, subTab?: string) => void;
     currentView: string;
     setSidebarOpen: (isOpen: boolean) => void;
     userRole: UserRole;
+    libraryActiveTab?: string;
 }
 
 const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; isOpen: boolean; onClick: () => void, isDisabled?: boolean }> = ({ icon, label, isActive, isOpen, onClick, isDisabled = false }) => {
@@ -62,11 +70,57 @@ const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolea
     );
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setSidebarOpen, userRole }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setSidebarOpen, userRole, libraryActiveTab }) => {
     const legalText = useTranslation('Legal');
     const dataPolicyText = useTranslation('Data Policy');
     const termsText = useTranslation('Terms of Service');
     const aiSuiteText = useTranslation('AI Suite');
+
+    const [isLibraryExpanded, setLibraryExpanded] = React.useState(currentView === 'library');
+
+    React.useEffect(() => {
+        if (currentView === 'library') {
+            setLibraryExpanded(true);
+        }
+    }, [currentView]);
+
+    const librarySubItems = [
+        { id: 'twin', label: 'CogniSacra Twin', icon: <Brain size={15} /> },
+        { id: 'universe', label: 'Knowledge Universe', icon: <Network size={15} /> },
+        { id: 'reader', label: 'AI Reading Mode', icon: <BookOpen size={15} /> },
+        { id: 'research', label: 'AI Research Desk', icon: <Compass size={15} /> },
+        { id: 'labs', label: 'STEM Lab Sandbox', icon: <Database size={15} /> },
+        { id: 'workspace', label: 'Study Cockpit', icon: <Settings size={15} /> },
+        { id: 'video', label: 'Video Intelligence', icon: <Film size={15} /> },
+        { id: 'market', label: 'Marketplace', icon: <ShoppingCart size={15} /> },
+        { id: 'network', label: 'Scholar Circle', icon: <Users size={15} /> },
+        { id: 'passport', label: 'Academic Passport', icon: <Award size={15} /> },
+    ];
+
+    const librarySubNav = isOpen && isLibraryExpanded && (
+        <ul className="pl-4 space-y-1 my-1 border-l-2 border-slate-200/60 dark:border-slate-800 ml-6 animate-fade-in text-left">
+            {librarySubItems.map(item => {
+                const isSubActive = currentView === 'library' && libraryActiveTab === item.id;
+                return (
+                    <li
+                        key={item.id}
+                        onClick={() => onNavigate('library', item.id)}
+                        className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11.5px] font-semibold transition cursor-pointer select-none
+                            ${isSubActive 
+                                ? 'bg-crimson/10 text-crimson dark:text-rose-400 font-extrabold border-r-2 border-crimson' 
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-805/40 hover:text-gray-900 dark:hover:text-white'
+                            }`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onNavigate('library', item.id); }}
+                    >
+                        <span className={`shrink-0 ${isSubActive ? 'text-crimson' : 'text-gray-400 dark:text-gray-500'}`}>{item.icon}</span>
+                        <span className="truncate">{item.label}</span>
+                    </li>
+                );
+            })}
+        </ul>
+    );
 
     const learnerNav = (
         <>
@@ -124,8 +178,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Virtual Library"
                 isActive={currentView === 'library'}
                 isOpen={isOpen}
-                onClick={() => onNavigate('library')}
+                onClick={() => {
+                    onNavigate('library');
+                    setLibraryExpanded(!isLibraryExpanded);
+                }}
             />
+            {librarySubNav}
         </>
     );
 
@@ -157,8 +215,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Virtual Library"
                 isActive={currentView === 'library'}
                 isOpen={isOpen}
-                onClick={() => onNavigate('library')}
+                onClick={() => {
+                    onNavigate('library');
+                    setLibraryExpanded(!isLibraryExpanded);
+                }}
             />
+            {librarySubNav}
             <NavItem
                 icon={<BarChart3 size={20} />}
                 label="Analytics"
@@ -276,7 +338,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
             <div className={`flex items-center h-20 px-6 justify-between flex-shrink-0`}>
                 <div className={`flex items-center space-x-3 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
                     <CogniSacraLogo className="w-9 h-9" />
-                    <span className="font-bold text-lg text-gray-900 dark:text-white font-serif tracking-tight whitespace-nowrap">EmpowerAfriq</span>
+                    <span className="font-bold text-lg text-gray-900 dark:text-white font-serif tracking-tight whitespace-nowrap">CogniSacra</span>
                 </div>
                 {/* Logo fallback for collapsed state */}
                 {!isOpen && (

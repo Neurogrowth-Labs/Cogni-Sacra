@@ -38,7 +38,7 @@ const initMockDatabase = () => {
     const users = [
       { id: defaultMockUserId, email: 'alex.turner@example.com', fullName: 'Alex Turner', role: 'learner' },
       { id: defaultInstructorId, email: 'instructor@example.com', fullName: 'Jane Doe', role: 'instructor' },
-      { id: defaultInstitutionId, email: 'institution@example.com', fullName: 'EmpowerAfriq Tech', role: 'institution' }
+      { id: defaultInstitutionId, email: 'institution@example.com', fullName: 'CogniSacra Tech', role: 'institution' }
     ];
     localStorage.setItem('supabase_mock_users', JSON.stringify(users));
 
@@ -46,7 +46,7 @@ const initMockDatabase = () => {
     const profiles = {
       [defaultMockUserId]: { id: defaultMockUserId, email: 'alex.turner@example.com', role: 'learner', full_name: 'Alex Turner', avatar_url: 'https://i.pravatar.cc/150?u=alexturner' },
       [defaultInstructorId]: { id: defaultInstructorId, email: 'instructor@example.com', role: 'instructor', full_name: 'Jane Doe', avatar_url: 'https://i.pravatar.cc/150?u=janedoe' },
-      [defaultInstitutionId]: { id: defaultInstitutionId, email: 'institution@example.com', role: 'institution', full_name: 'EmpowerAfriq Tech', avatar_url: 'https://i.pravatar.cc/150?u=techu' }
+      [defaultInstitutionId]: { id: defaultInstitutionId, email: 'institution@example.com', role: 'institution', full_name: 'CogniSacra Tech', avatar_url: 'https://i.pravatar.cc/150?u=techu' }
     };
     localStorage.setItem('supabase_mock_profiles', JSON.stringify(profiles));
 
@@ -85,11 +85,11 @@ const initMockDatabase = () => {
     const institutions = {
       [defaultInstitutionId]: {
         id: defaultInstitutionId,
-        name: 'EmpowerAfriq Tech',
+        name: 'CogniSacra Tech',
         tagline: 'Leading empowerment through tech education.',
-        about: 'EmpowerAfriq teaches digital skills to students globally.',
-        website: 'https://empowerafriq.edu',
-        contact_email: 'contact@empowerafriq.edu',
+        about: 'CogniSacra teaches digital skills to students globally.',
+        website: 'https://cognisacra.edu',
+        contact_email: 'contact@cognisacra.edu',
         contact_phone: '+1 (555) 0192-384',
         branding_logo_url: 'https://picsum.photos/seed/techu/100/40',
         branding_primary_color: '#A51C30',

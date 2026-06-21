@@ -85,6 +85,7 @@ const App: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [session, setSession] = useState<any>(null);
     const [rejoinSession, setRejoinSession] = useState<any>(null);
+    const [libraryActiveTab, setLibraryActiveTab] = useState<string>('twin');
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -246,7 +247,7 @@ const App: React.FC = () => {
                 // If not logged in via Supabase, go to auth
                  try {
                     // Legacy check for backward compatibility or if using local storage alongside supabase
-                    if (localStorage.getItem('empowerAfriqRememberMe') === 'true') {
+                    if (localStorage.getItem('cogniSacraRememberMe') === 'true') {
                        // Logic to handle remember me if separate from session
                     }
                 } catch (e) {
@@ -307,7 +308,7 @@ const App: React.FC = () => {
     const handleLogout = useCallback(async () => {
         try {
             await supabase.auth.signOut();
-            localStorage.removeItem('empowerAfriqRememberMe');
+            localStorage.removeItem('cogniSacraRememberMe');
         } catch (e) {
             console.warn("Error signing out:", e);
         }
@@ -344,11 +345,14 @@ const App: React.FC = () => {
         setCurrentView('course');
     }, []);
 
-    const handleNavigate = useCallback((view: View) => {
+    const handleNavigate = useCallback((view: View, subTab?: string) => {
         if (window.innerWidth < 1024) {
             setSidebarOpen(false);
         }
         setCurrentView(view);
+        if (view === 'library' && subTab) {
+            setLibraryActiveTab(subTab);
+        }
     }, []);
 
     const handleStartLesson = useCallback((lesson: Lesson, course: Course) => {
@@ -625,6 +629,7 @@ const App: React.FC = () => {
                         course={selectedCourse} 
                         onEnroll={handleEnrollCourse} 
                         onBack={() => setCurrentView('dashboard')}
+                        userProfile={userProfileData}
                     />
                 ) : (
                      <Dashboard 
@@ -863,7 +868,7 @@ const App: React.FC = () => {
             case 'ai-tools':
                 return <AIToolsView />;
             case 'library':
-                return userRole === 'institution' ? <CogniSacraInstitutionalLibraryView /> : <VirtualLibraryView userRole={userRole} />;
+                return userRole === 'institution' ? <CogniSacraInstitutionalLibraryView /> : <VirtualLibraryView userRole={userRole} initialTab={libraryActiveTab} onTabChange={setLibraryActiveTab} />;
             case 'institution-portal':
                 return <InstitutionPortalView institutionData={institutionData} />;
             case 'virtual-class':
@@ -943,6 +948,7 @@ const App: React.FC = () => {
                         currentView={currentView}
                         setSidebarOpen={setSidebarOpen}
                         userRole={userRole}
+                        libraryActiveTab={libraryActiveTab}
                     />
                 </div>
 

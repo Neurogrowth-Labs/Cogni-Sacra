@@ -116,6 +116,34 @@ const CourseDetailView: React.FC<CourseDetailViewProps> = ({ course, onBack, onS
                         <div className="uppercase tracking-wide text-sm text-crimson dark:text-crimson/90 font-semibold">{course.category}</div>
                         <h1 className="block mt-1 text-3xl leading-tight font-extrabold text-black dark:text-white font-serif">{course.title}</h1>
                         <p className="mt-2 text-gray-600 dark:text-gray-400">by {course.instructor}</p>
+
+                        {/* Detailed Labeled Offering Metadata */}
+                        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-800 text-sm max-w-2xl leading-relaxed">
+                            {course.offeredBy === 'institution' ? (
+                                <div className="space-y-1.5 text-[13px]">
+                                    <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold">
+                                        <span>🏢 Offered by Institution:</span>
+                                        <span className="text-slate-800 dark:text-slate-200">{course.institutionName || course.university || 'CogniSacra Academy'}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 pl-1 mt-1">
+                                        <div><span className="opacity-60 block text-[9px] uppercase tracking-wider font-extrabold">Faculty</span> {course.facultyName || 'Sovereign Academic Faculty'}</div>
+                                        <div><span className="opacity-60 block text-[9px] uppercase tracking-wider font-extrabold">Campus</span> {course.campusName || 'Main Campus'}</div>
+                                        <div><span className="opacity-60 block text-[9px] uppercase tracking-wider font-extrabold">Qualification Offered</span> <span className="inline-block bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 px-1.5 py-0.5 rounded text-[10px] uppercase font-black tracking-wider">{course.qualificationType || course.certificateType || 'Professional Certificate'}</span></div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-1.5 text-[13px]">
+                                    <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold">
+                                        <span>👨‍🏫 Offered by Independent Instructor:</span>
+                                        <span className="text-slate-800 dark:text-slate-200">{course.instructor}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 pl-1 mt-1">
+                                        <div><span className="opacity-60 block text-[9px] uppercase tracking-wider font-extrabold">Instructor Credentials</span> {course.instructorCredentials || 'Certified Subject Matter Expert'}</div>
+                                        <div><span className="opacity-60 block text-[9px] uppercase tracking-wider font-extrabold">Instructor Country</span> 🌍 {course.instructorCountry || 'Sovereign Africa'}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <p className="mt-4 text-gray-700 dark:text-gray-300">{course.description}</p>
                         <button 
                             onClick={() => setFeedbackModalOpen(true)} 

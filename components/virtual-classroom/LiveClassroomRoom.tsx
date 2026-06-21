@@ -632,7 +632,7 @@ export const LiveClassroomRoom: React.FC<LiveClassroomRoomProps> = ({ session, o
 
   // Copy invitation text
   const copyInvitePayload = () => {
-    const inviteText = `EmpowerAfriq Virtual Class Link\nClass: ${session.title}\nCourse: ${session.courseName}\nInstructor: ${session.instructor}\nURL: https://ai.studio/build/virtual-classroom-channel/${session.id}\nPasscode: ENTP-AFRIQ-2026`;
+    const inviteText = `CogniSacra Virtual Class Link\nClass: ${session.title}\nCourse: ${session.courseName}\nInstructor: ${session.instructor}\nURL: https://ai.studio/build/virtual-classroom-channel/${session.id}\nPasscode: COGNI-SACRA-2026`;
     navigator.clipboard.writeText(inviteText);
     setIsInviteCopied(true);
     triggerToast("Invite details copied to system clipboard.");
@@ -742,35 +742,37 @@ export const LiveClassroomRoom: React.FC<LiveClassroomRoomProps> = ({ session, o
         </div>
 
         {/* Dynamic Role Switch Tool at the Top (Crucial for live UI review) */}
-        <div className={`flex items-center gap-2 p-1.5 rounded-xl border shadow-sm ${userRole === 'instructor' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'}`}>
-          <span className="text-[10px] text-slate-550 uppercase font-extrabold px-2">Role Switch:</span>
-          <button
-            onClick={() => {
-              setUserRole('instructor');
-              triggerToast("Switched console to Instructor mode. Master controls unlocked.");
-            }}
-            className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition ${
-              userRole === 'instructor' 
-                ? 'bg-crimson text-white shadow-sm' 
-                : 'text-slate-400 hover:text-slate-350'
-            }`}
-          >
-            Instructor View
-          </button>
-          <button
-            onClick={() => {
-              setUserRole('learner');
-              triggerToast("Switched console to Learner mode. Interactive voting & chat enabled.");
-            }}
-            className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition ${
-              userRole === 'learner' 
-                ? (userRole === 'instructor' ? 'bg-crimson text-white shadow-sm' : 'bg-[#6264A7] text-white shadow-sm')
-                : 'text-slate-400 hover:text-slate-350'
-            }`}
-          >
-            Student View
-          </button>
-        </div>
+        {parentRole !== 'learner' && (
+          <div className={`flex items-center gap-2 p-1.5 rounded-xl border shadow-sm ${userRole === 'instructor' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'}`}>
+            <span className="text-[10px] text-slate-550 uppercase font-extrabold px-2">Role Switch:</span>
+            <button
+              onClick={() => {
+                setUserRole('instructor');
+                triggerToast("Switched console to Instructor mode. Master controls unlocked.");
+              }}
+              className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition ${
+                userRole === 'instructor' 
+                  ? 'bg-crimson text-white shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-350'
+              }`}
+            >
+              Instructor View
+            </button>
+            <button
+              onClick={() => {
+                setUserRole('learner');
+                triggerToast("Switched console to Learner mode. Interactive voting & chat enabled.");
+              }}
+              className={`text-[10px] font-bold px-2.5 py-1 rounded-lg transition ${
+                userRole === 'learner' 
+                  ? (userRole === 'instructor' ? 'bg-crimson text-white shadow-sm' : 'bg-[#6264A7] text-white shadow-sm')
+                  : 'text-slate-400 hover:text-slate-350'
+              }`}
+            >
+              Student View
+            </button>
+          </div>
+        )}
 
         {/* Navigation Info actions */}
         <div className="flex items-center gap-3">

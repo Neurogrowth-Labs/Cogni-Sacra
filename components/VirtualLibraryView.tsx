@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, Compass, Sparkles, Network, Database, Brain, Film, ShoppingCart, 
   Settings, Award, TrendingUp, Users, AwardIcon, FileText, Search, Play, 
@@ -50,8 +50,30 @@ const SAMPLE_LITERATURE = [
   }
 ];
 
-export default function VirtualLibraryView({ userRole }: { userRole: string }) {
-  const [activeTab, setActiveTab] = useState<'universe' | 'reader' | 'research' | 'labs' | 'workspace' | 'video' | 'market' | 'network' | 'passport' | 'twin'>('twin');
+export default function VirtualLibraryView({ 
+  userRole,
+  initialTab,
+  onTabChange
+}: { 
+  userRole: string; 
+  initialTab?: string;
+  onTabChange?: (tab: string) => void;
+}) {
+  const [activeTab, setActiveTab] = useState<'universe' | 'reader' | 'research' | 'labs' | 'workspace' | 'video' | 'market' | 'network' | 'passport' | 'twin'>(
+    (initialTab as any) || 'twin'
+  );
+
+  useEffect(() => {
+    if (initialTab && initialTab !== activeTab) {
+      setActiveTab(initialTab as any);
+    }
+  }, [initialTab]);
+
+  useEffect(() => {
+    if (onTabChange) {
+      onTabChange(activeTab);
+    }
+  }, [activeTab, onTabChange]);
 
   // Universal content navigation states
   const [contentSearchText, setContentSearchText] = useState('');
@@ -582,14 +604,14 @@ Circular solutions in Africa are increasingly dynamic, transitioning from surviv
                 <div className="flex justify-between items-start">
                   <div className="space-y-0.5">
                     <span className="text-[8px] uppercase tracking-widest font-black text-rose-450 block">Lifelong Scholar Locker</span>
-                    <h3 className="text-base font-serif font-bold text-white">EmpowerAfriq Academic Card</h3>
+                    <h3 className="text-base font-serif font-bold text-white">CogniSacra Academic Card</h3>
                   </div>
                   <Globe size={18} className="text-rose-450 animate-pulse" />
                 </div>
 
                 <div className="my-6 space-y-2">
                   <span className="text-[9px] uppercase font-black tracking-widest text-slate-404 block">Credentials Verification ID</span>
-                  <code className="text-xs text-slate-201 block font-mono bg-black/40 p-2 rounded-xl">EAP-992-88419-X</code>
+                  <code className="text-xs text-slate-201 block font-mono bg-black/40 p-2 rounded-xl">CSP-992-88419-X</code>
                   <p className="text-xs font-black">Hold: Sarah Mwangi</p>
                 </div>
 
@@ -608,7 +630,7 @@ Circular solutions in Africa are increasingly dynamic, transitioning from surviv
                 <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
                   {[
                     { title: 'Circular Economies System Certification', issuer: 'University of Nairobi', date: '2026-06-18', status: 'Verifiable Signature Green' },
-                    { title: 'STEM Basic Titration Lab Competency', issuer: 'EmpowerAfriq Academy', date: '2026-06-12', status: 'Sovereign Lock Verified' }
+                    { title: 'STEM Basic Titration Lab Competency', issuer: 'CogniSacra Academy', date: '2026-06-12', status: 'Sovereign Lock Verified' }
                   ].map((cert, idx) => (
                     <div key={idx} className="p-3 border rounded-xl flex justify-between items-center bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 border-slate-100 dark:border-slate-850 transition">
                       <div className="space-y-1 max-w-[80%]">

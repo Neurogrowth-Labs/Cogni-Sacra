@@ -66,9 +66,51 @@ interface SecurityAlert {
   resolved: boolean;
 }
 
+interface NodeProps {
+  label: string;
+  id: string;
+  roles: GovernanceRole[];
+  selectedRoleName: string;
+  setSelectedRoleName: (name: string) => void;
+  isLeaf?: boolean;
+  children?: React.ReactNode;
+}
+
+const GovernanceTreeNode: React.FC<NodeProps> = ({ label, id, roles, selectedRoleName, setSelectedRoleName, isLeaf = false, children }) => {
+  const role = roles.find(r => r.id === id || r.name.toLowerCase().includes(label.toLowerCase()) || label.toLowerCase().includes(r.name.toLowerCase()));
+  const actualName = role ? role.name : label;
+  const isSelected = selectedRoleName === actualName;
+  
+  return (
+    <div className="space-y-1">
+      <button
+        type="button"
+        onClick={() => setSelectedRoleName(actualName)}
+        className={`w-full text-left p-2 rounded-xl transition-all duration-150 flex items-center justify-between border ${
+          isSelected
+            ? 'bg-gradient-to-r from-rose-500 to-crimson text-white border-transparent shadow-[0_0_8px_rgba(225,29,72,0.3)]'
+            : 'bg-slate-50/70 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-900 border-slate-150 dark:border-slate-800 text-slate-700 dark:text-slate-300 pointer-events-auto'
+        }`}
+      >
+        <div className="flex items-center gap-1.5 truncate">
+          <span className="text-[10px] opacity-75">{isLeaf ? '•' : '📂'}</span>
+          <span className="font-bold truncate text-[11px]">{label}</span>
+        </div>
+        {!isLeaf && <span className="text-[9px] opacity-60">↳</span>}
+      </button>
+      {children && (
+        <div className="pl-3.5 border-l border-slate-200 dark:border-slate-800 space-y-1 mt-1 ml-2">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function InstitutionLearnersView({ institutionData, setInstitutionData }: InstitutionLearnersViewProps) {
   // Tabs: governance / workEngine / auditing / multisite / aiplatform
   const [activeTab, setActiveTab] = useState<'governance' | 'workEngine' | 'auditing' | 'multisite' | 'aiplatform'>('governance');
+  const [governanceViewMode, setGovernanceViewMode] = useState<'list' | 'tree'>('tree');
   
   // Multicampus Setup state
   const [campuses, setCampuses] = useState<CampusDetails[]>([
@@ -764,52 +806,111 @@ export default function InstitutionLearnersView({ institutionData, setInstitutio
                 
                 {/* Visual Roles list (Left col) */}
                 <div className="lg:col-span-4 bg-white dark:bg-slate-950 p-5 rounded-3xl border border-slate-150 dark:border-slate-850 shadow-sm space-y-4">
-                  <div className="border-b pb-3 space-y-1.5">
+                  <div className="border-b pb-3 space-y-2">
                     <h3 className="font-serif font-black text-slate-900 dark:text-white text-base">Sovereign Hierarchy</h3>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-550">Search any of the 18 governance roles listed dynamically</p>
-                    <div className="relative">
-                      <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="Search roles (e.g. Dean, Curriculum)"
-                        value={roleSearchTerm}
-                        onChange={(e) => setRoleSearchTerm(e.target.value)}
-                        className="w-full text-xs pl-8 pr-3.5 py-2 border rounded-xl border-slate-150 dark:border-slate-850 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-rose-505"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-                    {filteredRoles.map(role => (
-                      <button
-                        key={role.id}
-                        onClick={() => setSelectedRoleName(role.name)}
-                        className={`w-full text-left p-3 rounded-2xl border text-xs transition duration-150 flex items-center justify-between ${
-                          selectedRoleName === role.name
-                            ? 'bg-gradient-to-r from-slate-900 to-indigo-950 text-white border-transparent'
-                            : 'bg-slate-50/50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border-slate-150 dark:border-slate-850 text-slate-700 dark:text-slate-355'
-                        }`}
+                    <p className="text-[11px] text-slate-400 dark:text-slate-550">Explore or search the institutional governance structure</p>
+                    
+                    {/* View mode toggle */}
+                    <div className="flex gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 rounded-xl text-[10.5px] font-bold">
+                      <button 
+                        type="button" 
+                        onClick={() => setGovernanceViewMode('tree')} 
+                        className={`flex-1 text-center py-1.5 px-2 rounded-lg transition-all duration-150 ${governanceViewMode === 'tree' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
                       >
-                        <div className="space-y-1">
-                          <h4 className="font-bold leading-none">{role.name}</h4>
-                          <div className="flex gap-1 items-center">
-                            <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${
-                              selectedRoleName === role.name 
-                                ? 'bg-white/10 text-rose-200' 
-                                : 'bg-slate-200/50 dark:bg-slate-800 text-slate-500'
-                            }`}>
-                              {role.category}
-                            </span>
-                            <span className="text-[9.5px] opacity-70">Level: {role.accessLevel}</span>
-                          </div>
-                        </div>
-                        <ChevronRight size={14} className="opacity-60 shrink-0 ml-1.5" />
+                        Visual Tree
                       </button>
-                    ))}
-                    {filteredRoles.length === 0 && (
-                      <p className="text-center text-xs text-slate-450 py-10">No governance roles match your filter.</p>
+                      <button 
+                        type="button" 
+                        onClick={() => setGovernanceViewMode('list')} 
+                        className={`flex-1 text-center py-1.5 px-2 rounded-lg transition-all duration-150 ${governanceViewMode === 'list' ? 'bg-white dark:bg-slate-800 text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}`}
+                      >
+                        Search List
+                      </button>
+                    </div>
+
+                    {governanceViewMode === 'list' && (
+                      <div className="relative mt-2">
+                        <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Search roles (e.g. Dean, Curriculum)"
+                          value={roleSearchTerm}
+                          onChange={(e) => setRoleSearchTerm(e.target.value)}
+                          className="w-full text-xs pl-8 pr-3.5 py-2 border rounded-xl border-slate-150 dark:border-slate-850 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-rose-505"
+                        />
+                      </div>
                     )}
                   </div>
+
+                  {governanceViewMode === 'tree' ? (
+                    <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+                      <div className="space-y-2">
+                        <GovernanceTreeNode label="Super Admin (CogniSacra)" id="super-admin" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName}>
+                          <GovernanceTreeNode label="Institution Owner / Chancellor" id="owner" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName}>
+                            <GovernanceTreeNode label="Institution Administrator" id="inst-admin" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName}>
+                              <div className="ml-2 border-l border-rose-300 dark:border-rose-950 pl-2.5 py-1 space-y-1">
+                                <GovernanceTreeNode label="Academic Affairs" id="academic" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Finance Department" id="finance" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Librarians" id="librarian" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Researchers" id="researcher" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Student Affairs" id="student-affairs" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="ICT Department" id="ict" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Quality Assurance" id="quality-assurance" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                              </div>
+                            </GovernanceTreeNode>
+
+                            <GovernanceTreeNode label="Dean (Faculty Level)" id="dean" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName}>
+                              <div className="ml-2 border-l border-rose-300 dark:border-rose-950 pl-2.5 py-1 space-y-1">
+                                <GovernanceTreeNode label="Head of Department (HOD)" id="hod" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Program Coordinator" id="coordinator" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                                <GovernanceTreeNode label="Curriculum Manager" id="curriculum" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                              </div>
+                            </GovernanceTreeNode>
+
+                            <GovernanceTreeNode label="Lecturer / Instructor" id="lecturer" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                          </GovernanceTreeNode>
+                        </GovernanceTreeNode>
+
+                        <div className="pt-2 border-t border-dashed border-slate-200 dark:border-slate-800 space-y-1.5">
+                          <GovernanceTreeNode label="Students" id="student" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                          <GovernanceTreeNode label="Alumni" id="alumni" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                          <GovernanceTreeNode label="External Users / Public" id="external" roles={roles} selectedRoleName={selectedRoleName} setSelectedRoleName={setSelectedRoleName} isLeaf />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                      {filteredRoles.map(role => (
+                        <button
+                          key={role.id}
+                          onClick={() => setSelectedRoleName(role.name)}
+                          className={`w-full text-left p-3 rounded-2xl border text-xs transition duration-150 flex items-center justify-between ${
+                            selectedRoleName === role.name
+                              ? 'bg-gradient-to-r from-slate-900 to-indigo-950 text-white border-transparent'
+                              : 'bg-slate-50/50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-900 border-slate-150 dark:border-slate-850 text-slate-700 dark:text-slate-355'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <h4 className="font-bold leading-none">{role.name}</h4>
+                            <div className="flex gap-1 items-center">
+                              <span className={`text-[9px] px-1 py-0.2 rounded font-mono ${
+                                selectedRoleName === role.name 
+                                  ? 'bg-white/10 text-rose-200' 
+                                  : 'bg-slate-200/50 dark:bg-slate-800 text-slate-500'
+                              }`}>
+                                {role.category}
+                              </span>
+                              <span className="text-[9.5px] opacity-70">Level: {role.accessLevel}</span>
+                            </div>
+                          </div>
+                          <ChevronRight size={14} className="opacity-60 shrink-0 ml-1.5" />
+                        </button>
+                      ))}
+                      {filteredRoles.length === 0 && (
+                        <p className="text-center text-xs text-slate-450 py-10">No governance roles match your filter.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Role specifications details & Assign member (Middle & Right columns) */}

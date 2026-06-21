@@ -38,14 +38,14 @@ const ContactView: React.FC = () => {
                         <EnvelopeIcon className="w-6 h-6 mr-4 text-crimson flex-shrink-0" />
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">General Inquiries</h3>
-                            <a href="mailto:support@empowerafriq.edu" className="text-blue-600 dark:text-blue-400 hover:underline">support@empowerafriq.edu</a>
+                            <a href="mailto:support@cognisacra.edu" className="text-blue-600 dark:text-blue-400 hover:underline">support@cognisacra.edu</a>
                         </div>
                     </div>
                     <div className="flex items-start">
                         <EnvelopeIcon className="w-6 h-6 mr-4 text-crimson flex-shrink-0" />
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Admissions</h3>
-                            <a href="mailto:admissions@empowerafriq.edu" className="text-blue-600 dark:text-blue-400 hover:underline">admissions@empowerafriq.edu</a>
+                            <a href="mailto:admissions@cognisacra.edu" className="text-blue-600 dark:text-blue-400 hover:underline">admissions@cognisacra.edu</a>
                         </div>
                     </div>
                     <div className="flex items-start">

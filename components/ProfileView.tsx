@@ -254,6 +254,12 @@ const ProfileView: React.FC<ProfileViewProps> = ({ userProfile, courses, jobs, o
                             </div>
                             <p className="text-md text-gray-500 dark:text-gray-400">@{userProfile.username}</p>
                             <p className="text-md text-gray-600 dark:text-gray-300 mt-1">{userProfile.title}</p>
+                            {userProfile.academicInstitution && (
+                                <div className="mt-2 flex items-center justify-center sm:justify-start gap-1 py-1 px-3 bg-red-500/10 border border-red-500/20 text-crimson dark:text-red-300 rounded-full text-xs font-semibold w-fit">
+                                    <AcademicCapIcon className="w-3.5 h-3.5 mr-1" />
+                                    <span>Enrolled Academic Institution: {userProfile.academicInstitution}</span>
+                                </div>
+                            )}
                             <div className="flex justify-center sm:justify-start space-x-4 mt-3">
                                 {userProfile.socialLinks?.linkedin && <a href={userProfile.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-500"><LinkedInIcon className="w-6 h-6" /></a>}
                                 {userProfile.socialLinks?.github && <a href={userProfile.socialLinks.github} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-800 dark:hover:text-white"><GitHubIcon className="w-6 h-6" /></a>}

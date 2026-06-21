@@ -1,5 +1,5 @@
 {
-  "name": "empowerafriq-academy---ai-powered-education-platform",
+  "name": "cognisacra-academy---ai-powered-education-platform",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,10 +11,12 @@
   "dependencies": {
     "@google/genai": "^1.19.0",
     "@supabase/supabase-js": "2.39.0",
+    "i18next": "^26.3.1",
     "lucide-react": "^1.21.0",
     "motion": "^12.40.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-i18next": "^17.0.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

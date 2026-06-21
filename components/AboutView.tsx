@@ -7,13 +7,13 @@ const AboutView: React.FC = () => {
         <div className="max-w-4xl mx-auto animate-fade-in bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg">
             <div className="text-center mb-8">
                 <CogniSacraLogo className="w-20 h-20 mx-auto text-crimson" />
-                <h1 className="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white font-serif">About EmpowerAfriq Academy</h1>
+                <h1 className="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white font-serif">About CogniSacra Academy</h1>
                 <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Learn Without Limits</p>
             </div>
             
             <div className="space-y-6 text-gray-700 dark:text-gray-300">
                 <p>
-                    EmpowerAfriq Academy is a next-generation online education platform dedicated to delivering world-class digital learning experiences. We believe that education should be accessible, engaging, and personalized for everyone, everywhere.
+                    CogniSacra Academy is a next-generation online education platform dedicated to delivering world-class digital learning experiences. We believe that education should be accessible, engaging, and personalized for everyone, everywhere.
                 </p>
                 <p>
                     Our mission is to empower learners, educators, and institutions globally by combining cutting-edge UI/UX, AI-powered personalization, and a scalable, robust infrastructure. We strive to create a learning ecosystem where knowledge is not just consumed, but created, shared, and applied to solve real-world problems.

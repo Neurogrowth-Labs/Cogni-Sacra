@@ -124,6 +124,14 @@ export interface Course {
   language?: string;
   coupons?: Coupon[];
   status?: 'active' | 'upcoming' | 'archived';
+  statusLabel?: 'Self-Paced' | 'Online' | 'Archived' | 'Coming Soon';
+  offeredBy?: 'institution' | 'instructor';
+  institutionName?: string;
+  facultyName?: string;
+  campusName?: string;
+  qualificationType?: string;
+  instructorCredentials?: string;
+  instructorCountry?: string;
 }
 
 export interface ChatMessage {
@@ -188,6 +196,7 @@ export interface UserProfile {
     learningGoals?: string[];
     mentorshipStatus?: 'seeking' | 'offering' | 'none';
     targetCareer?: string;
+    academicInstitution?: string;
 }
 
 export interface UserSettings {

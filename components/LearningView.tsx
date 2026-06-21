@@ -31,7 +31,7 @@ const NotesPanel: React.FC<{ lesson: Lesson }> = ({ lesson }) => {
 
     useEffect(() => {
         try {
-            const savedNotes = localStorage.getItem(`empower-afriq-notes-${lesson.id}`);
+            const savedNotes = localStorage.getItem(`cognisacra-notes-${lesson.id}`);
             if (savedNotes) {
                 setNotes(savedNotes);
             } else {
@@ -45,7 +45,7 @@ const NotesPanel: React.FC<{ lesson: Lesson }> = ({ lesson }) => {
     useEffect(() => {
         const handler = setTimeout(() => {
             try {
-                localStorage.setItem(`empower-afriq-notes-${lesson.id}`, notes);
+                localStorage.setItem(`cognisacra-notes-${lesson.id}`, notes);
             } catch (error) {
                 console.error("Failed to save notes to localStorage", error);
             }
@@ -246,6 +246,16 @@ const DiscussionPanel: React.FC<{
     );
 };
 
+const getYouTubeEmbedUrl = (url: string | undefined): string | null => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+        return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    return url;
+};
+
 const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onCompleteLesson, onNavigateLesson }) => {
     const [sidebarTab, setSidebarTab] = useState<SidebarTab>('syllabus');
     const [infoTab, setInfoTab] = useState<InfoTab>('transcript');
@@ -274,7 +284,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
         setDiscussionPosts(newPosts);
         try {
             // This triggers the 'storage' event in other tabs, enabling real-time updates.
-            localStorage.setItem(`empower-afriq-discussion-${lesson.id}`, JSON.stringify(newPosts));
+            localStorage.setItem(`cognisacra-discussion-${lesson.id}`, JSON.stringify(newPosts));
         } catch (e) {
             console.error("Failed to save discussion to localStorage", e);
         }
@@ -287,7 +297,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
     const hasPassed = isQuizFinished && userScorePercentage >= passingScorePercentage;
 
     useEffect(() => {
-        const discussionKey = `empower-afriq-discussion-${lesson.id}`;
+        const discussionKey = `cognisacra-discussion-${lesson.id}`;
         try {
             const savedDiscussions = localStorage.getItem(discussionKey);
             setDiscussionPosts(savedDiscussions ? JSON.parse(savedDiscussions) : lesson.discussion || []);
@@ -305,14 +315,14 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
     // Load/Save Annotations
     useEffect(() => {
         try {
-            const saved = localStorage.getItem(`empower-afriq-annotations-${lesson.id}`);
+            const saved = localStorage.getItem(`cognisacra-annotations-${lesson.id}`);
             setAnnotations(saved ? JSON.parse(saved) : []);
         } catch (e) { setAnnotations([]); }
     }, [lesson.id]);
 
     useEffect(() => {
         try {
-            localStorage.setItem(`empower-afriq-annotations-${lesson.id}`, JSON.stringify(annotations));
+            localStorage.setItem(`cognisacra-annotations-${lesson.id}`, JSON.stringify(annotations));
         } catch(e) { console.error("Failed to save annotations", e); }
     }, [annotations, lesson.id]);
 
@@ -518,9 +528,26 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
             </div>);
     };
 
-    const renderDefaultContent = () => (
-        <>
-            {lesson.format === 'video' && lesson.videoUrl ? (<div className="aspect-video bg-black rounded-t-2xl overflow-hidden"><iframe src={lesson.videoUrl} title={lesson.title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="w-full h-full"></iframe></div>) : (<div className="bg-black aspect-video flex items-center justify-center rounded-t-2xl"><p className="text-white">Video Player Placeholder</p></div>)}
+    const renderDefaultContent = () => {
+        const embedUrl = getYouTubeEmbedUrl(lesson.videoUrl) || '';
+        return (
+            <>
+                {lesson.format === 'video' && lesson.videoUrl ? (
+                    <div className="aspect-video bg-black rounded-t-2xl overflow-hidden">
+                        <iframe 
+                            src={embedUrl} 
+                            title={lesson.title} 
+                            frameBorder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowFullScreen 
+                            className="w-full h-full"
+                        ></iframe>
+                    </div>
+                ) : (
+                    <div className="bg-black aspect-video flex items-center justify-center rounded-t-2xl">
+                        <p className="text-white">Video Player Placeholder</p>
+                    </div>
+                )}
             {lesson.checklist?.length > 0 && (
                 <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 font-serif">Lesson Checklist</h3>
@@ -539,7 +566,7 @@ const LearningView: React.FC<LearningViewProps> = ({ course, lesson, onBack, onC
             </div>
             {activeAnnotation && <AnnotationTooltip annotation={activeAnnotation} />}
         </>
-    );
+    ); };
 
     return (
         <div className="flex flex-col lg:flex-row h-full max-h-[calc(100vh-8rem)] animate-fade-in gap-6">

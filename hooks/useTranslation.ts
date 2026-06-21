@@ -1,14 +1,17 @@
 
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation as useI18nTranslation } from 'react-i18next';
 
 export const useTranslation = (text: string) => {
+    const { t } = useI18nTranslation();
     const { language, translate } = useLanguage();
-    const [translatedText, setTranslatedText] = useState(text);
+    const [translatedText, setTranslatedText] = useState(() => t(text));
 
     useEffect(() => {
-        if (language === 'en') {
-            setTranslatedText(text);
+        const i18nTranslated = t(text);
+        if (i18nTranslated !== text || language === 'en') {
+            setTranslatedText(i18nTranslated);
             return;
         }
 
@@ -30,7 +33,7 @@ export const useTranslation = (text: string) => {
         return () => {
             isMounted = false;
         };
-    }, [text, language, translate]);
+    }, [text, language, translate, t]);
 
     return translatedText;
 };

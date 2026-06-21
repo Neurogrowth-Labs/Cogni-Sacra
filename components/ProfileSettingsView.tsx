@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { UserSettings } from '../../types';
+import { UserSettings } from '../types';
 import AccountSettings from './settings/AccountSettings';
 import LearningSettings from './settings/LearningSettings';
 import NotificationSettings from './settings/NotificationSettings';

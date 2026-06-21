@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext, useCallback, useRef, ReactNode } from 'react';
 import { translateText } from '../services/geminiService';
 import { translations } from '../translations';
+import i18n from '../i18n';
 
 interface LanguageContextType {
     language: string;
@@ -40,6 +41,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
             console.error('Translation failed:', error);
             return text; // Fallback to original text
         }
+    }, [language]);
+    
+    React.useEffect(() => {
+        i18n.changeLanguage(language);
+        document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = language;
     }, [language]);
     
     const setLanguage = (lang: string) => {

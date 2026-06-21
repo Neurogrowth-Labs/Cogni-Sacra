@@ -1,6 +1,6 @@
 {
-  "name": "EmpowerAfriq Academy - AI-Powered Education Platform",
-  "description": "A next-generation online education platform featuring Africa's premier AI-powered Virtual Library ecosystem, real-time STEM simulation labs, and personalized CogniSacra Knowledge Twin cognitive companions.",
+  "name": "CogniSacra Academy - AI-Powered Education Platform",
+  "description": "A next-generation online education platform featuring the premier AI-powered Virtual Library ecosystem, real-time STEM simulation labs, and personalized CogniSacra Knowledge Twin cognitive companions.",
   "requestFramePermissions": [
     "microphone",
     "camera",
