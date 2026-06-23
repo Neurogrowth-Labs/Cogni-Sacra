@@ -48,8 +48,9 @@ import LandingPage from './components/landing/LandingPage';
 import { supabase } from './services/supabaseClient';
 import VirtualLibraryView from './components/VirtualLibraryView';
 import CogniSacraInstitutionalLibraryView from './components/CogniSacraInstitutionalLibraryView';
+import { AIArchitectView } from './components/AIArchitectView';
 
-type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library';
+type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
@@ -86,6 +87,7 @@ const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
     const [rejoinSession, setRejoinSession] = useState<any>(null);
     const [libraryActiveTab, setLibraryActiveTab] = useState<string>('twin');
+    const [tutorActiveTab, setTutorActiveTab] = useState<string>('ask-tutor');
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -352,6 +354,9 @@ const App: React.FC = () => {
         setCurrentView(view);
         if (view === 'library' && subTab) {
             setLibraryActiveTab(subTab);
+        }
+        if (view === 'tutor' && subTab) {
+            setTutorActiveTab(subTab);
         }
     }, []);
 
@@ -737,7 +742,7 @@ const App: React.FC = () => {
                     />
                 );
             case 'tutor':
-                return <AITutorView userRole={userRole} />;
+                return <AITutorView userRole={userRole} initialTab={tutorActiveTab} onTabChange={setTutorActiveTab} />;
             case 'profile':
                 return <ProfileView 
                     userProfile={userProfileData} 
@@ -867,6 +872,8 @@ const App: React.FC = () => {
                 return <TermsOfServiceView />;
             case 'ai-tools':
                 return <AIToolsView />;
+            case 'ai-architect':
+                return <AIArchitectView userRole={userRole} />;
             case 'library':
                 return userRole === 'institution' ? <CogniSacraInstitutionalLibraryView /> : <VirtualLibraryView userRole={userRole} initialTab={libraryActiveTab} onTabChange={setLibraryActiveTab} />;
             case 'institution-portal':
@@ -949,6 +956,7 @@ const App: React.FC = () => {
                         setSidebarOpen={setSidebarOpen}
                         userRole={userRole}
                         libraryActiveTab={libraryActiveTab}
+                        tutorActiveTab={tutorActiveTab}
                     />
                 </div>
 

@@ -8,6 +8,7 @@ import TrophyIcon from './icons/TrophyIcon';
 import ClockIcon from './icons/ClockIcon';
 import { useTranslation } from '../hooks/useTranslation';
 import FeaturedCourseCard from './FeaturedCourseCard';
+import EmptyState from './EmptyState';
 import CogniSacraLogo from './icons/IntelliLearnLogo';
 import { getQuickAnswer } from '../services/geminiService';
 import SparklesIcon from './icons/SparklesIcon';
@@ -190,29 +191,23 @@ const DashboardHero: React.FC<{ quote: string, userName: string, userRole: UserR
     const displayName = userRole === 'institution' ? userName : (userName.split(' ')[0] || 'Learner');
     
     return (
-        <div className="relative p-8 sm:p-10 rounded-3xl overflow-hidden shadow-2xl group">
-             {/* Background Mesh Gradient */}
-             <div className="absolute inset-0 bg-gradient-to-r from-crimson to-rose-600"></div>
-             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 mix-blend-overlay"></div>
-             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/20 rounded-full blur-3xl -ml-20 -mb-20 mix-blend-overlay"></div>
-             <div className="absolute inset-0 bg-grid-white/[0.05] bg-[length:20px_20px]"></div>
-
-            <div className="relative z-10 flex flex-col md:flex-row justify-between md:items-end gap-6 text-white">
+        <div className="relative p-8 sm:p-10 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40">
+            <div className="relative z-10 flex flex-col md:flex-row justify-between md:items-end gap-6 text-gray-900 dark:text-white">
                 <div className="max-w-2xl">
-                    <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full mb-4 border border-white/10">
-                        <FireIcon className="w-4 h-4 text-orange-300" />
-                        <span className="text-xs font-bold tracking-wide uppercase">5 Day Streak</span>
+                    <div className="inline-flex items-center space-x-2 bg-crimson/5 dark:bg-crimson/10 px-3 py-1 rounded-full mb-4 border border-crimson/10">
+                        <FireIcon className="w-4 h-4 text-crimson" />
+                        <span className="text-xs font-bold tracking-wide uppercase text-crimson">5 Day Streak</span>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl font-extrabold font-serif tracking-tight leading-tight">
-                        {welcomeText} <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-pink-100">{displayName}!</span>
+                    <h1 className="text-4xl sm:text-5xl font-light tracking-tight leading-tight">
+                        {welcomeText} <br/><span className="font-extrabold text-crimson">{displayName}!</span>
                     </h1>
-                    <p className="mt-4 text-lg text-pink-100 font-medium max-w-lg leading-relaxed opacity-90">{subtitleText}</p>
+                    <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 font-normal max-w-lg leading-relaxed">{subtitleText}</p>
                 </div>
                 
-                <div className="md:text-right max-w-xs">
-                     <p className="text-md italic font-serif text-white/80 border-l-2 border-white/30 pl-4 md:border-l-0 md:border-r-2 md:pl-0 md:pr-4">
+                <div className="md:text-right max-w-xs border-l-2 border-crimson/30 pl-4 md:border-l-0 md:border-r-2 md:pl-0 md:pr-4">
+                     <p className="text-sm italic text-gray-400 dark:text-gray-500">
                         "{quote}"
-                    </p>
+                     </p>
                 </div>
             </div>
         </div>
@@ -239,6 +234,13 @@ const Dashboard: React.FC<DashboardProps> = ({ courses, onSelectCourse, onNaviga
 
     useEffect(() => {
         setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
+    }, []);
+
+    const handleScrollToCatalog = useCallback(() => {
+        const catalogElement = document.getElementById('explore-catalog');
+        if (catalogElement) {
+            catalogElement.scrollIntoView({ behavior: 'smooth' });
+        }
     }, []);
 
     const ongoingCourses = useMemo(() => courses.filter(c => c.progress > 0 && c.progress < 100), [courses]);
@@ -280,6 +282,10 @@ const Dashboard: React.FC<DashboardProps> = ({ courses, onSelectCourse, onNaviga
 
             <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
                 <div className="lg:col-span-3 space-y-12">
+                     {ongoingCourses.length === 0 && bookmarkedCourseIds.size === 0 && (
+                         <EmptyState onBrowse={handleScrollToCatalog} />
+                     )}
+                     
                      {ongoingCourses.length > 0 && (
                         <div>
                             <div className="flex items-center mb-6">
@@ -300,7 +306,7 @@ const Dashboard: React.FC<DashboardProps> = ({ courses, onSelectCourse, onNaviga
                         </div>
                     )}
                     
-                    <div>
+                    <div id="explore-catalog">
                         <div className="mb-6">
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white font-serif">{exploreCoursesText}</h2>
                             <p className="mt-1 text-md text-gray-500 dark:text-gray-400">{findPerfectCourseText}</p>
@@ -356,7 +362,28 @@ const Dashboard: React.FC<DashboardProps> = ({ courses, onSelectCourse, onNaviga
                             </div>
                         </div>
 
-                        <div key={gridKey} className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+                        {/* High Visibility Quick-Filter Category Pills */}
+                        <div className="flex flex-wrap items-center gap-2 mt-8 mb-1 border-b border-gray-100 dark:border-gray-800 pb-4 select-none">
+                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mr-2">Categories:</span>
+                            {categories.map(category => {
+                                const isActive = filters.subject === category;
+                                return (
+                                    <button
+                                        key={category}
+                                        onClick={() => setFilters(f => ({ ...f, subject: category }))}
+                                        className={`px-3.5 py-1.5 text-xs font-bold rounded-full border transition-all duration-200 transform active:scale-95 cursor-pointer ${
+                                            isActive
+                                                ? 'bg-crimson border-crimson text-white shadow-md'
+                                                : 'bg-white dark:bg-gray-800/80 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                                        }`}
+                                    >
+                                        {category}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div key={gridKey} className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                             {filteredCourses.map((course, index) => (
                                 <div key={course.id} className="animate-stagger-in" style={{ animationDelay: `${index * 75}ms` }}>
                                     <CourseCard

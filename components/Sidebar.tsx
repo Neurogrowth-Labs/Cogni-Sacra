@@ -25,10 +25,13 @@ import {
     Database,
     Film,
     ShoppingCart,
-    Award
+    Award,
+    MessageSquare,
+    Mic,
+    Upload
 } from 'lucide-react';
 
-type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library';
+type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -37,6 +40,7 @@ interface SidebarProps {
     setSidebarOpen: (isOpen: boolean) => void;
     userRole: UserRole;
     libraryActiveTab?: string;
+    tutorActiveTab?: string;
 }
 
 const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; isOpen: boolean; onClick: () => void, isDisabled?: boolean }> = ({ icon, label, isActive, isOpen, onClick, isDisabled = false }) => {
@@ -70,17 +74,24 @@ const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolea
     );
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setSidebarOpen, userRole, libraryActiveTab }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setSidebarOpen, userRole, libraryActiveTab, tutorActiveTab }) => {
     const legalText = useTranslation('Legal');
     const dataPolicyText = useTranslation('Data Policy');
     const termsText = useTranslation('Terms of Service');
     const aiSuiteText = useTranslation('AI Suite');
 
     const [isLibraryExpanded, setLibraryExpanded] = React.useState(currentView === 'library');
+    const [isTutorExpanded, setTutorExpanded] = React.useState(currentView === 'tutor');
 
     React.useEffect(() => {
         if (currentView === 'library') {
             setLibraryExpanded(true);
+        }
+    }, [currentView]);
+
+    React.useEffect(() => {
+        if (currentView === 'tutor') {
+            setTutorExpanded(true);
         }
     }, [currentView]);
 
@@ -113,6 +124,40 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onNavigate('library', item.id); }}
+                    >
+                        <span className={`shrink-0 ${isSubActive ? 'text-crimson' : 'text-gray-400 dark:text-gray-500'}`}>{item.icon}</span>
+                        <span className="truncate">{item.label}</span>
+                    </li>
+                );
+            })}
+        </ul>
+    );
+
+    const tutorSubItems = [
+        { id: 'ask-tutor', label: 'Ask Tutor', icon: <MessageSquare size={13} /> },
+        { id: 'voice-tutor', label: 'Voice Tutor', icon: <Mic size={13} /> },
+        { id: 'video-tutor', label: 'Video Tutor', icon: <Film size={13} /> },
+        { id: 'study-mode', label: 'Study Mode', icon: <BookOpen size={13} /> },
+        { id: 'homework-help', label: 'Homework Help', icon: <Upload size={13} /> },
+        { id: 'exam-prep', label: 'Exam Prep', icon: <Award size={13} /> },
+    ];
+
+    const tutorSubNav = isOpen && isTutorExpanded && (
+        <ul className="pl-4 space-y-1 my-1 border-l-2 border-slate-200/60 dark:border-slate-800 ml-6 animate-fade-in text-left">
+            {tutorSubItems.map(item => {
+                const isSubActive = currentView === 'tutor' && tutorActiveTab === item.id;
+                return (
+                    <li
+                        key={item.id}
+                        onClick={() => onNavigate('tutor', item.id)}
+                        className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11.5px] font-semibold transition cursor-pointer select-none
+                            ${isSubActive 
+                                ? 'bg-crimson/10 text-crimson dark:text-red-400 font-extrabold border-r-2 border-crimson' 
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-851/40 hover:text-gray-900 dark:hover:text-white'
+                            }`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onNavigate('tutor', item.id); }}
                     >
                         <span className={`shrink-0 ${isSubActive ? 'text-crimson' : 'text-gray-400 dark:text-gray-500'}`}>{item.icon}</span>
                         <span className="truncate">{item.label}</span>
@@ -157,8 +202,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="AI Tutor"
                 isActive={currentView === 'tutor'}
                 isOpen={isOpen}
-                onClick={() => onNavigate('tutor')}
+                onClick={() => {
+                    onNavigate('tutor');
+                    setTutorExpanded(!isTutorExpanded);
+                }}
             />
+            {tutorSubNav}
             <NavItem
                 icon={<Trophy size={20} />}
                 label="Achievements"
@@ -296,12 +345,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 isOpen={isOpen}
                 onClick={() => onNavigate('institution-settings')}
             />
+            <NavItem
+                icon={<Sparkles size={20} className="text-amber-500 fill-amber-500 animate-pulse" />}
+                label="AI Architect ⭐"
+                isActive={currentView === 'ai-architect'}
+                isOpen={isOpen}
+                onClick={() => onNavigate('ai-architect')}
+            />
         </>
     );
     
     const aiSuiteNav = (
         <>
-            {userRole !== 'learner' && (
+            {userRole === 'instructor' && (
                 <NavItem
                     icon={<Sparkles size={20} />}
                     label="AI Tools"

@@ -3,7 +3,53 @@ import { Course } from '../types';
 import StarIcon from './icons/StarIcon';
 import { useTranslation } from '../hooks/useTranslation';
 import BookmarkIcon from './icons/BookmarkIcon';
-import { GraduationCap, Globe, Archive, Rocket, Sparkles, Shield, Bookmark } from 'lucide-react';
+import { GraduationCap, Globe, Archive, Rocket, Sparkles, Shield, Bookmark, Clock } from 'lucide-react';
+
+const calculateEstimatedReadingTime = (course: Course): string => {
+    let totalMinutes = 0;
+    
+    if (course.modules && course.modules.length > 0) {
+        course.modules.forEach(module => {
+            if (module.lessons && module.lessons.length > 0) {
+                module.lessons.forEach(lesson => {
+                    // Base estimation by lesson format in minutes
+                    switch (lesson.format) {
+                        case 'reading':
+                            totalMinutes += 12;
+                            break;
+                        case 'video':
+                            totalMinutes += 15;
+                            break;
+                        case 'quiz':
+                        case 'adaptive-quiz':
+                            totalMinutes += 10;
+                            break;
+                        case 'project':
+                            totalMinutes += 45;
+                            break;
+                        case 'live-session':
+                        case 'metaverse':
+                            totalMinutes += 30;
+                            break;
+                        default:
+                            totalMinutes += 15;
+                    }
+                });
+            }
+        });
+    }
+    
+    if (totalMinutes === 0) {
+        return course.duration || '2 hours';
+    }
+    
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    if (hours > 0) {
+        return `${hours}h ${mins > 0 ? mins + 'm' : ''}`;
+    }
+    return `${mins} min`;
+};
 
 interface CourseCardProps {
     course: Course;
@@ -85,6 +131,15 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isBookmarked,
     const badge = getBadgeConfig(statusLabel);
     const StatusIcon = badge.icon;
     const bonusLabels = getBonusLabels(course);
+
+    const [animatedProgress, setAnimatedProgress] = React.useState(0);
+    React.useEffect(() => {
+        setAnimatedProgress(0);
+        const timer = setTimeout(() => {
+            setAnimatedProgress(course.progress);
+        }, 150);
+        return () => clearTimeout(timer);
+    }, [course.progress]);
 
     return (
         <div
@@ -207,8 +262,14 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isBookmarked,
                     )}
                 </div>
 
+                {/* Dynamic Reading/Study Time Estimate */}
+                <div className="flex items-center gap-1.5 mt-3 mb-1 text-[11px] text-gray-400 dark:text-gray-500 font-medium select-none pl-0.5">
+                    <Clock className="w-3.5 h-3.5 text-crimson shrink-0" />
+                    <span>Estimated time: <strong className="font-bold text-slate-700 dark:text-slate-300">{calculateEstimatedReadingTime(course)}</strong></span>
+                </div>
+
                 {/* Footer Metadata & Pricing */}
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/80">
+                <div className="flex items-center justify-between mt-auto pt-3.5 border-t border-slate-100 dark:border-slate-700/80">
                     <div className="flex flex-col">
                         {course.rating && course.reviews ? (
                             <div className="flex items-center mb-1 select-none">
@@ -226,8 +287,11 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onSelect, isBookmarked,
 
                     {course.progress > 0 ? (
                         <div className="flex flex-col items-end select-none">
-                            <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-705 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-crimson to-orange-500 rounded-full animate-pulse-subtle" style={{ width: `${course.progress}%` }}></div>
+                            <div className="w-16 h-1.5 bg-slate-105 dark:bg-slate-700/80 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-crimson to-orange-500 rounded-full transition-all duration-1000 ease-out" 
+                                    style={{ width: `${animatedProgress}%` }}
+                                ></div>
                             </div>
                             <p className="text-[10px] font-semibold text-slate-505 dark:text-slate-400 mt-1">
                                 {course.progress === 100 ? 'Done' : `${course.progress}% ${completeText}`}
