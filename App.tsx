@@ -88,6 +88,7 @@ const App: React.FC = () => {
     const [rejoinSession, setRejoinSession] = useState<any>(null);
     const [libraryActiveTab, setLibraryActiveTab] = useState<string>('twin');
     const [tutorActiveTab, setTutorActiveTab] = useState<string>('ask-tutor');
+    const [isAuthReady, setIsAuthReady] = useState(false);
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -99,21 +100,52 @@ const App: React.FC = () => {
     
     // Supabase Auth Listener
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            if (session) fetchUserProfile(session.user.id);
-        }).catch(err => {
-            console.warn("Supabase initial session fetch error:", err);
-        });
+        const initSession = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                    const rememberMe = localStorage.getItem('cogniSacraRememberMe');
+                    if (rememberMe === 'false') {
+                        await supabase.auth.signOut();
+                        setSession(null);
+                        setOnboardingStep('splash');
+                    } else {
+                        const profile = await fetchUserProfile(session.user.id);
+                        if (profile?.onboarding_completed) {
+                            setOnboardingStep('loaded');
+                        } else {
+                            setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                        }
+                    }
+                } else {
+                    setOnboardingStep('splash');
+                }
+            } catch (err) {
+                console.warn("Supabase initial session fetch error:", err);
+                setOnboardingStep('splash');
+            } finally {
+                setIsAuthReady(true);
+            }
+        };
+
+        initSession();
 
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
-            if (session) fetchUserProfile(session.user.id);
-            else {
+            if (session) {
+                fetchUserProfile(session.user.id).then(profile => {
+                    if (profile?.onboarding_completed) {
+                        setOnboardingStep('loaded');
+                    } else {
+                        setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                    }
+                });
+            } else {
                 // Handle logout state cleanup if necessary
                 setUserProfileData(initialUserProfile);
+                setOnboardingStep('splash');
             }
         });
 
@@ -233,6 +265,7 @@ const App: React.FC = () => {
         } catch (err) {
             console.error("Profile fetch error:", err);
         }
+        return null;
     };
 
     const handleSetAppState = (state: AppState) => {
@@ -242,25 +275,6 @@ const App: React.FC = () => {
             setIsFlipping(false);
         }, 500); // Match CSS transition duration
     };
-
-    useEffect(() => {
-        if (appState === 'app' && onboardingStep === 'splash') {
-            if (!session) {
-                // If not logged in via Supabase, go to auth
-                 try {
-                    // Legacy check for backward compatibility or if using local storage alongside supabase
-                    if (localStorage.getItem('cogniSacraRememberMe') === 'true') {
-                       // Logic to handle remember me if separate from session
-                    }
-                } catch (e) {
-                    console.warn("Could not access localStorage.");
-                }
-            } else {
-                // If session exists, skip auth
-                setOnboardingStep('role-selection');
-            }
-        }
-    }, [appState, onboardingStep, session]);
 
 
     useEffect(() => {
@@ -413,10 +427,17 @@ const App: React.FC = () => {
     const handleSelectRoleOnboarding = useCallback(async (role: UserRole) => {
         setUserRole(role);
         
+        const nextOnboardingStep = role === 'learner' ? 'personalization' : 'loaded';
+        const onboardingCompleted = role !== 'learner';
+
         if (session && session.user) {
             try {
-                // Update role in profiles table
-                await supabase.from('profiles').update({ role: role }).eq('id', session.user.id);
+                // Update role and onboarding progress in profiles table
+                await supabase.from('profiles').update({
+                    role: role,
+                    onboarding_step: nextOnboardingStep,
+                    onboarding_completed: onboardingCompleted
+                }).eq('id', session.user.id);
                 
                 // Ensure corresponding table entry exists
                 if (role === 'instructor') {
@@ -456,9 +477,10 @@ const App: React.FC = () => {
         setLearnerInterests(interests);
         // Optimistically update local state, and sync to DB
         if (session) {
-            supabase.from('learners_data').update({ skills: interests }).eq('id', session.user.id).then(({ error }) => {
+            supabase.from('learners_data').update({ skills: interests, interests: interests }).eq('id', session.user.id).then(({ error }) => {
                 if (error) console.error("Error saving interests:", error);
             });
+            supabase.from('profiles').update({ onboarding_step: 'welcome' }).eq('id', session.user.id).then();
         }
         setOnboardingStep('welcome');
     }, [session]);
@@ -466,6 +488,16 @@ const App: React.FC = () => {
     const handleSelectInstitutionPlan = useCallback((planName: string) => {
         setInstitutionSubscriptionPlan(planName);
     }, []);
+
+    const handleWelcomeStart = useCallback(() => {
+        if (session) {
+            supabase.from('profiles').update({
+                onboarding_step: 'loaded',
+                onboarding_completed: true
+            }).eq('id', session.user.id).then();
+        }
+        setOnboardingStep('loaded');
+    }, [session]);
 
     const handleSelectInstructorPlan = useCallback((planName: string) => {
         setInstructorSubscriptionPlan(planName);
@@ -922,13 +954,20 @@ const App: React.FC = () => {
             case 'personalization':
                 return <PersonalizationView onComplete={handlePersonalizationComplete} />;
             case 'welcome':
-                return <WelcomeAssistantView onStart={() => setOnboardingStep('loaded')} />;
+                return <WelcomeAssistantView onStart={handleWelcomeStart} />;
             default:
                 return null;
         }
     };
     
     const renderAppContent = () => {
+        if (!isAuthReady) {
+            return (
+                <div className="h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                    <div className="animate-pulse text-crimson font-serif text-2xl">CogniSacra Academy</div>
+                </div>
+            );
+        }
         if (onboardingStep !== 'loaded') {
             return (
                  <div className="bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center transition-opacity duration-500">

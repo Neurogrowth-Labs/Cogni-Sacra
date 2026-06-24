@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://jqvszhyikmoqssdhktyu.supabase.co';
-const supabaseKey = 'sb_publishable_I_eSyldqlLUCdiuXdMVgPA_cyQMwcle';
+// Use environment variables, fallback to empty for build time
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 // Safe instantiation of real client
 let realSupabase: any = null;
@@ -586,6 +587,24 @@ export const supabase = {
           console.warn("[Supabase] auth.signInWithOAuth failed, continuing with Local OAuth Simulation:", err);
         }
         return signInOAuthMock(params);
+      }
+    },
+
+    async resetPasswordForEmail(email: string, options?: any) {
+      try {
+        if (isOffline) throw new Error("Client is offline");
+        if (!realSupabase) throw new Error("Real client offline");
+        const res = await realSupabase.auth.resetPasswordForEmail(email, options);
+        if (res.error && isFetchError(res.error)) {
+          throw res.error;
+        }
+        return res;
+      } catch (err: any) {
+        if (isFetchError(err)) {
+          isOffline = true;
+          console.warn("[Supabase] auth.resetPasswordForEmail failed, continuing with Local Simulation:", err);
+        }
+        return { data: {}, error: null };
       }
     },
 

@@ -7,6 +7,7 @@ import LinkedInIcon from '../icons/LinkedInIcon';
 import EyeIcon from '../icons/EyeIcon';
 import EyeSlashIcon from '../icons/EyeSlashIcon';
 import CheckCircleIcon from '../icons/CheckCircleIcon';
+import PasswordResetView from './PasswordResetView';
 import { supabase } from '../../services/supabaseClient';
 
 interface LoginViewProps {
@@ -14,6 +15,7 @@ interface LoginViewProps {
 }
 
 type AuthTab = 'signin' | 'signup';
+type AuthMode = 'auth' | 'reset';
 
 const SocialButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void }> = ({ icon, label, onClick }) => (
     <button
@@ -27,17 +29,28 @@ const SocialButton: React.FC<{ icon: React.ReactNode; label: string; onClick: ()
 
 const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
     const [activeTab, setActiveTab] = useState<AuthTab>('signin');
+    const [mode, setMode] = useState<AuthMode>('auth');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [verificationMsg, setVerificationMsg] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [rememberMe, setRememberMe] = useState(() => {
+        try {
+            const saved = localStorage.getItem('cogniSacraRememberMe');
+            return saved !== 'false';
+        } catch (e) {
+            return true;
+        }
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setErrorMsg(null);
+        setVerificationMsg(null);
 
         try {
             if (activeTab === 'signup') {
@@ -60,7 +73,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                     if (data.session) {
                          onAuthenticated(fullName || email);
                     } else {
-                        alert('Please check your email to confirm your account.');
+                        setVerificationMsg('Please check your email to confirm your account. Once confirmed, you can sign in.');
                     }
                 }
             } else {
@@ -72,12 +85,21 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                 if (error) throw error;
 
                 if (data.user) {
+                    try {
+                        localStorage.setItem('cogniSacraRememberMe', rememberMe ? 'true' : 'false');
+                    } catch (e) {
+                        console.warn("Could not access localStorage.");
+                    }
                     onAuthenticated(data.user.user_metadata.full_name || email);
                 }
             }
         } catch (error: any) {
             console.error('Authentication error:', error);
-            setErrorMsg(error.message || 'An unexpected error occurred');
+            if (error.message?.toLowerCase().includes('email not confirmed')) {
+                setVerificationMsg('Please verify your email before signing in. Check your inbox for the confirmation link.');
+            } else {
+                setErrorMsg(error.message || 'An unexpected error occurred');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -138,6 +160,10 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
             {/* Right Side - Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900">
                 <div className="w-full max-w-md space-y-10">
+                    {mode === 'reset' ? (
+                        <PasswordResetView onBack={() => setMode('auth')} />
+                    ) : (
+                        <>
                     <div className="text-center lg:text-left">
                         <h2 className="text-4xl font-bold text-gray-900 dark:text-white font-serif tracking-tight">
                             {activeTab === 'signin' ? 'Welcome back' : 'Create an account'}
@@ -167,6 +193,11 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                         {errorMsg && (
                             <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
                                 {errorMsg}
+                            </div>
+                        )}
+                        {verificationMsg && (
+                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
+                                {verificationMsg}
                             </div>
                         )}
 
@@ -229,6 +260,27 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                             )}
                         </div>
 
+                        <div className="flex items-center justify-between">
+                            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    className="w-4 h-4 rounded border-gray-300 text-crimson focus:ring-crimson"
+                                />
+                                Remember me
+                            </label>
+                            {activeTab === 'signin' && (
+                                <button
+                                    type="button"
+                                    onClick={() => setMode('reset')}
+                                    className="text-sm font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                >
+                                    Forgot password?
+                                </button>
+                            )}
+                        </div>
+
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -244,12 +296,15 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                             onClick={() => {
                                 setActiveTab(activeTab === 'signin' ? 'signup' : 'signin');
                                 setErrorMsg(null);
+                                setVerificationMsg(null);
                             }}
                             className="font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
                         >
                             {activeTab === 'signin' ? 'Sign up' : 'Log in'}
                         </button>
                     </p>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
