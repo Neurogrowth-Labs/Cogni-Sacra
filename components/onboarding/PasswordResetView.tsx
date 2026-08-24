@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../../services/supabaseClient';
+import { authService } from '../../services/authService';
 
 interface PasswordResetViewProps {
     onBack: () => void;
@@ -18,11 +18,8 @@ const PasswordResetView: React.FC<PasswordResetViewProps> = ({ onBack }) => {
         setMessage(null);
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
-            });
-            if (error) throw error;
-            setMessage('Check your email for a password reset link.');
+            const msg = await authService.forgotPassword({ email });
+            setMessage(msg || 'Check your email for a password reset link.');
         } catch (error: any) {
             console.error('Password reset error:', error);
             setErrorMsg(error.message || 'Failed to send reset email.');

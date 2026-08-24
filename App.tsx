@@ -18,6 +18,7 @@ import LoginView from './components/onboarding/LoginView';
 import RoleSelectionView from './components/onboarding/RoleSelectionView';
 import PersonalizationView from './components/onboarding/PersonalizationView';
 import WelcomeAssistantView from './components/onboarding/WelcomeAssistantView';
+import ResetPasswordFormView from './components/onboarding/ResetPasswordFormView';
 import CourseLandingPage from './components/CourseLandingPage';
 import LearningView from './components/LearningView';
 import LessonCompletionModal from './components/LessonCompletionModal';
@@ -46,12 +47,14 @@ import VirtualClassroomView from './components/VirtualClassroomView';
 import { InstitutionPortalView } from './components/InstitutionPortalView';
 import LandingPage from './components/landing/LandingPage';
 import { supabase } from './services/supabaseClient';
+import { authService } from './services/authService';
+import type { AuthUser } from './services/authService';
 import VirtualLibraryView from './components/VirtualLibraryView';
 import CogniSacraInstitutionalLibraryView from './components/CogniSacraInstitutionalLibraryView';
 import { AIArchitectView } from './components/AIArchitectView';
 
 type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
-type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded';
+type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded' | 'reset-password';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
 type AppState = 'landing' | 'app';
@@ -89,6 +92,7 @@ const App: React.FC = () => {
     const [libraryActiveTab, setLibraryActiveTab] = useState<string>('twin');
     const [tutorActiveTab, setTutorActiveTab] = useState<string>('ask-tutor');
     const [isAuthReady, setIsAuthReady] = useState(false);
+    const [resetToken, setResetToken] = useState<string | null>(null);
 
      useEffect(() => {
         if (theme === 'dark') {
@@ -98,30 +102,70 @@ const App: React.FC = () => {
         }
     }, [theme]);
     
-    // Supabase Auth Listener
+    // Backend Auth Session Check
     useEffect(() => {
         const initSession = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    const rememberMe = localStorage.getItem('cogniSacraRememberMe');
-                    if (rememberMe === 'false') {
-                        await supabase.auth.signOut();
-                        setSession(null);
-                        setOnboardingStep('splash');
-                    } else {
-                        const profile = await fetchUserProfile(session.user.id);
-                        if (profile?.onboarding_completed) {
-                            setOnboardingStep('loaded');
+                // Check for reset-password or verify-email token in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlToken = urlParams.get('token');
+                const path = window.location.pathname;
+
+                if (path === '/reset-password' && urlToken) {
+                    setResetToken(urlToken);
+                    setAppState('app');
+                    setOnboardingStep('reset-password');
+                    setIsAuthReady(true);
+                    return;
+                }
+
+                if (path === '/verify-email' && urlToken) {
+                    // Auto-verify email via backend then redirect to login
+                    try {
+                        const response = await fetch(
+                            `${import.meta.env.VITE_BACKEND_URL || 'https://cogni-sacra-backend-production.up.railway.app'}/api/v1/auth/verify-email?token=${urlToken}`
+                        );
+                        const data = await response.json();
+                        if (data.success) {
+                            window.history.replaceState({}, document.title, '/');
+                            setOnboardingStep('auth');
                         } else {
-                            setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                            console.warn('Email verification failed:', data.message);
+                            setOnboardingStep('splash');
                         }
+                    } catch (err) {
+                        console.warn('Email verification error:', err);
+                        setOnboardingStep('splash');
+                    }
+                    setIsAuthReady(true);
+                    return;
+                }
+
+                const rememberMe = localStorage.getItem('cogniSacraRememberMe');
+                if (rememberMe === 'false') {
+                    authService.logout();
+                    setSession(null);
+                    setOnboardingStep('splash');
+                    setIsAuthReady(true);
+                    return;
+                }
+
+                // Check if we have a valid token and fetch current user from backend
+                const user = await authService.getCurrentUser();
+                if (user) {
+                    setSession({ user: { id: user.id, email: user.email, user_metadata: { full_name: user.name } } });
+                    // Try to fetch profile from Supabase for onboarding state (keep existing profile logic)
+                    const profile = await fetchUserProfile(user.id);
+                    if (profile?.onboarding_completed) {
+                        setOnboardingStep('loaded');
+                    } else {
+                        setOnboardingStep(profile?.onboarding_step || 'role-selection');
                     }
                 } else {
                     setOnboardingStep('splash');
                 }
             } catch (err) {
-                console.warn("Supabase initial session fetch error:", err);
+                console.warn("Auth session init error:", err);
                 setOnboardingStep('splash');
             } finally {
                 setIsAuthReady(true);
@@ -130,26 +174,52 @@ const App: React.FC = () => {
 
         initSession();
 
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            if (session) {
-                fetchUserProfile(session.user.id).then(profile => {
-                    if (profile?.onboarding_completed) {
-                        setOnboardingStep('loaded');
+        // Listen for auth state changes from authService
+        const { unsubscribe } = authService.onAuthStateChange((event, user) => {
+            if (event === 'SIGNED_IN' && user) {
+                setSession({ user: { id: user.id, email: user.email, user_metadata: { full_name: user.name } } });
+
+                // Update profile data from backend user
+                setUserProfileData(prev => ({
+                    ...prev,
+                    name: user.name || prev.name,
+                    avatarUrl: user.avatar_url || `https://i.pravatar.cc/150?u=${user.email}`,
+                }));
+
+                // Set role from backend (map backend roles to frontend roles)
+                if (user.role) {
+                    let mappedRole: UserRole = 'learner';
+                    if (user.role === 'instructor') {
+                        mappedRole = 'instructor';
+                    } else if (user.role === 'institution' || user.role === 'institution_admin') {
+                        mappedRole = 'institution';
                     } else {
-                        setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                        // 'user', 'independent_learner', 'institution_learner', etc. -> learner
+                        mappedRole = 'learner';
                     }
-                });
-            } else {
-                // Handle logout state cleanup if necessary
+                    setUserRole(mappedRole);
+                }
+
+                // If user already has a role from backend, skip onboarding
+                if (user.role && user.role !== 'user') {
+                    setOnboardingStep('loaded');
+                } else {
+                    fetchUserProfile(user.id).then(profile => {
+                        if (profile?.onboarding_completed) {
+                            setOnboardingStep('loaded');
+                        } else {
+                            setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                        }
+                    });
+                }
+            } else if (event === 'SIGNED_OUT') {
+                setSession(null);
                 setUserProfileData(initialUserProfile);
                 setOnboardingStep('splash');
             }
         });
 
-        return () => subscription.unsubscribe();
+        return () => unsubscribe();
     }, []);
 
     const fetchUserProfile = async (userId: string) => {
@@ -323,6 +393,7 @@ const App: React.FC = () => {
 
     const handleLogout = useCallback(async () => {
         try {
+            authService.logout();
             await supabase.auth.signOut();
             localStorage.removeItem('cogniSacraRememberMe');
         } catch (e) {
@@ -419,9 +490,50 @@ const App: React.FC = () => {
         setApplicationModalOpen(true);
     }, []);
 
-    const handleAuthentication = useCallback((name: string) => {
-        // This is triggered after successful Supabase login in LoginView
-        setOnboardingStep('role-selection');
+    const handleAuthentication = useCallback(async (name: string) => {
+        // This is triggered after successful backend API login/register in LoginView
+        const user = authService.getUser();
+        if (user) {
+            setSession({ user: { id: user.id, email: user.email, user_metadata: { full_name: user.name } } });
+
+            // Update userProfileData with data from backend
+            setUserProfileData(prev => ({
+                ...prev,
+                name: user.name || name || prev.name,
+                avatarUrl: user.avatar_url || `https://i.pravatar.cc/150?u=${user.email}`,
+            }));
+
+            // Set role from backend (map backend roles to frontend roles)
+            if (user.role) {
+                let mappedRole: UserRole = 'learner';
+                if (user.role === 'instructor') {
+                    mappedRole = 'instructor';
+                } else if (user.role === 'institution' || user.role === 'institution_admin') {
+                    mappedRole = 'institution';
+                } else {
+                    // 'user', 'independent_learner', 'institution_learner', etc. -> learner
+                    mappedRole = 'learner';
+                }
+                setUserRole(mappedRole);
+            }
+
+            // If user already has a role from backend, they're past onboarding
+            // Skip role selection if backend returns a valid role
+            if (user.role && user.role !== 'user') {
+                // User has completed registration with role selection on backend
+                setOnboardingStep('loaded');
+            } else {
+                // Try to fetch additional profile from Supabase (for onboarding state)
+                const profile = await fetchUserProfile(user.id);
+                if (profile?.onboarding_completed) {
+                    setOnboardingStep('loaded');
+                } else {
+                    setOnboardingStep('role-selection');
+                }
+            }
+        } else {
+            setOnboardingStep('role-selection');
+        }
     }, []);
 
     const handleSelectRoleOnboarding = useCallback(async (role: UserRole) => {
@@ -949,6 +1061,22 @@ const App: React.FC = () => {
                 return <SplashScreen onFinish={() => setOnboardingStep('auth')} />;
             case 'auth':
                 return <LoginView onAuthenticated={handleAuthentication} />;
+            case 'reset-password':
+                return resetToken ? (
+                    <ResetPasswordFormView
+                        token={resetToken}
+                        onSuccess={() => {
+                            setResetToken(null);
+                            window.history.replaceState({}, document.title, '/');
+                            setOnboardingStep('auth');
+                        }}
+                        onBackToLogin={() => {
+                            setResetToken(null);
+                            window.history.replaceState({}, document.title, '/');
+                            setOnboardingStep('auth');
+                        }}
+                    />
+                ) : null;
             case 'role-selection':
                 return <RoleSelectionView onSelectRole={handleSelectRoleOnboarding} />;
             case 'personalization':
