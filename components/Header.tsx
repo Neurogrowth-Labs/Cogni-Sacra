@@ -1,8 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from './icons/MenuIcon';
 import UserIcon from './icons/UserIcon';
 import { UserRole } from '../types';
+import { viewToPath } from '../App';
 import LogoutIcon from './icons/LogoutIcon';
 import GlobeAltIcon from './icons/GlobeAltIcon';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -66,11 +68,12 @@ const getNotificationIcon = (type: NotificationType) => {
 };
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, userRole, onLogout, onNavigateToProfile, onNavigateToSettings, userName, userAvatarUrl, institutionName, institutionLogoUrl, searchTerm, onSearchChange }) => {
+    const navigate = useNavigate();
     const [isLangDropdownOpen, setLangDropdownOpen] = useState(false);
     const [isUserMenuOpen, setUserMenuOpen] = useState(false);
     const [isNotifDropdownOpen, setNotifDropdownOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
-    
+
     const { language, setLanguage } = useLanguage();
     
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -218,13 +221,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, userRole, onLogout, on
                                 </div>
                                 <div className="py-2">
                                     {userRole !== 'institution' && (
-                                        <button onClick={() => { onNavigateToProfile(); setUserMenuOpen(false); }} className="w-full flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-crimson dark:hover:text-red-400 transition-colors">
+                                        <Link
+                                            to={viewToPath['profile']}
+                                            onClick={() => { onNavigateToProfile(); setUserMenuOpen(false); }}
+                                            className="w-full flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-crimson dark:hover:text-red-400 transition-colors"
+                                        >
                                             <UserIcon className="w-4 h-4 mr-3" /> My Profile
-                                        </button>
+                                        </Link>
                                     )}
-                                    <button onClick={() => { onNavigateToSettings(); setUserMenuOpen(false); }} className="w-full flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-crimson dark:hover:text-red-400 transition-colors">
+                                    <Link
+                                        to={viewToPath['profile-settings']}
+                                        onClick={() => { onNavigateToSettings(); setUserMenuOpen(false); }}
+                                        className="w-full flex items-center px-5 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-crimson dark:hover:text-red-400 transition-colors"
+                                    >
                                         <CogIcon className="w-4 h-4 mr-3" /> Settings
-                                    </button>
+                                    </Link>
                                 </div>
                                 <div className="py-2 border-t border-gray-100 dark:border-gray-700">
                                     <button onClick={handleLogoutClick} className="w-full flex items-center px-5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium">

@@ -36,6 +36,27 @@ export interface ChangePasswordPayload {
   newPassword: string;
 }
 
+export interface UpdateProfilePayload {
+  name?: string;
+  username?: string;
+  bio?: string;
+  avatar_url?: string;
+  cover_image_url?: string;
+  title?: string;
+  location_city?: string;
+  location_country?: string;
+  skills?: string[];
+  social_links?: {
+    linkedin?: string;
+    github?: string;
+    behance?: string;
+    portfolio?: string;
+  };
+  learning_goals?: string[];
+  mentorship_status?: 'seeking' | 'offering' | 'none';
+  target_career?: string;
+}
+
 export interface AuthUser {
   id: string;
   name: string;
@@ -257,6 +278,45 @@ export const authService = {
     }
 
     return apiResponse.message;
+  },
+
+  // Update user profile
+  async updateProfile(payload: UpdateProfilePayload): Promise<AuthUser> {
+    const token = this.getToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const response = await fetch(`${API_BASE_URL}/users/profile`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const apiResponse: ApiResponse = await response.json();
+
+    if (!response.ok || !apiResponse.success) {
+      if (response.status === 401) {
+        this.logout();
+        throw new Error('Session expired. Please login again.');
+      }
+      if (response.status === 409) {
+        throw new Error(apiResponse.message || 'Username already taken');
+      }
+      throw new Error(apiResponse.message || 'Failed to update profile');
+    }
+
+    const user = apiResponse.data?.user;
+    if (!user) {
+      throw new Error('Update failed: No user data returned');
+    }
+
+    // Update saved user data
+    this.saveUser(user);
+    notifyListeners('TOKEN_REFRESHED', user);
+
+    return user;
   },
 
   // Get current user

@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
 import MenuIcon from '../icons/MenuIcon';
 import XMarkIcon from '../icons/XMarkIcon';
-import { LandingView } from './LandingPage';
+import { LandingView, landingViewToPath } from './LandingPage';
 
 interface LandingHeaderProps {
     currentView: LandingView;
@@ -18,7 +18,8 @@ const NavLink: React.FC<{
     children: React.ReactNode;
     isMobile?: boolean;
 }> = ({ view, current, setView, children, isMobile = false }) => (
-    <button
+    <Link
+        to={landingViewToPath[view]}
         onClick={() => setView(view)}
         className={`${isMobile ? 'block w-full text-left px-4 py-2 text-base font-semibold' : 'px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wider uppercase transition-all duration-305'} ${
             current === view
@@ -27,7 +28,7 @@ const NavLink: React.FC<{
         }`}
     >
         {children}
-    </button>
+    </Link>
 );
 
 
@@ -46,14 +47,14 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
         <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-rose-100/60 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
-                    <div className="flex-shrink-0 flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
+                    <Link to="/" className="flex-shrink-0 flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
                         <div className="p-1.5 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl shadow-[0_4px_15px_rgba(239,68,68,0.2)]">
                             <CogniSacraLogo className="w-8 h-8 text-white" />
                         </div>
                         <span className="font-extrabold text-lg sm:text-xl font-sans tracking-wider text-slate-900 flex items-center gap-1">
                             CogniSacra<span className="text-red-600">™</span>
                         </span>
-                    </div>
+                    </Link>
                     <div className="hidden md:flex md:items-center md:space-x-1.5 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/50">
                         {navItems.map(item => (
                             <NavLink key={item.view} view={item.view} current={currentView} setView={setView}>
@@ -62,9 +63,9 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
                         ))}
                     </div>
                     <div className="hidden md:flex items-center space-x-3">
-                         <button onClick={onGetStarted} className="px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-650 to-red-500 hover:from-red-500 hover:to-red-650 rounded-full shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-[0_6px_25px_rgba(239,68,68,0.4)] transition-all duration-300 transform hover:-translate-y-0.5">
+                         <Link to="/signin" onClick={onGetStarted} className="px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-650 to-red-500 hover:from-red-500 hover:to-red-650 rounded-full shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-[0_6px_25px_rgba(239,68,68,0.4)] transition-all duration-300 transform hover:-translate-y-0.5">
                             Sign In
-                         </button>
+                         </Link>
                     </div>
                     <div className="md:hidden flex items-center">
                         <button
@@ -89,9 +90,9 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
                                 {item.label}
                             </NavLink>
                         ))}
-                         <button onClick={onGetStarted} className="mt-4 w-11/12 ml-auto mr-auto block px-4 py-3 rounded-full text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-red-500">
+                         <Link to="/signin" onClick={onGetStarted} className="mt-4 w-11/12 ml-auto mr-auto block px-4 py-3 rounded-full text-sm font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-600 to-red-500">
                             Sign In
-                        </button>
+                        </Link>
                     </div>
                 </div>
             )}

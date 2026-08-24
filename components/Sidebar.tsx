@@ -1,23 +1,25 @@
 
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserRole } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
+import { viewToPath, View } from '../App';
 import CogniSacraLogo from './icons/IntelliLearnLogo';
-import { 
-    Home, 
-    Calendar, 
-    Video, 
-    Globe, 
-    Sparkles, 
-    Trophy, 
-    Briefcase, 
-    BookOpen, 
-    BarChart3, 
-    Settings, 
-    Building2, 
-    Users, 
-    Info, 
-    Mail, 
+import {
+    Home,
+    Calendar,
+    Video,
+    Globe,
+    Sparkles,
+    Trophy,
+    Briefcase,
+    BookOpen,
+    BarChart3,
+    Settings,
+    Building2,
+    Users,
+    Info,
+    Mail,
     ChevronLeft,
     Brain,
     Network,
@@ -31,7 +33,7 @@ import {
     Upload
 } from 'lucide-react';
 
-type NavView = 'dashboard' | 'tutor' | 'profile' | 'jobs' | 'instructor-dashboard' | 'institution-dashboard' | 'instructor-analytics' | 'community' | 'institution-learners' | 'institution-settings' | 'calendar' | 'institution-profile' | 'instructor-settings' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
+type NavView = View;
 
 interface SidebarProps {
     isOpen: boolean;
@@ -43,23 +45,21 @@ interface SidebarProps {
     tutorActiveTab?: string;
 }
 
-const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; isOpen: boolean; onClick: () => void, isDisabled?: boolean }> = ({ icon, label, isActive, isOpen, onClick, isDisabled = false }) => {
+const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolean; isOpen: boolean; onClick: () => void; to?: string; isDisabled?: boolean }> = ({ icon, label, isActive, isOpen, onClick, to, isDisabled = false }) => {
     const translatedLabel = useTranslation(label);
-    return (
-        <li
-            onClick={!isDisabled ? onClick : undefined}
-            className={`relative flex items-center p-3 my-1.5 rounded-xl transition-all duration-300 group cursor-pointer
-                ${isActive 
-                    ? 'bg-gradient-to-r from-crimson to-rose-600 text-white shadow-glow' 
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
-                } 
-                ${isOpen ? 'justify-start' : 'justify-center'} 
-                ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            role="button"
-            tabIndex={0}
-            aria-label={label}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
-        >
+    const navigate = useNavigate();
+
+    const handleClick = (e: React.MouseEvent) => {
+        if (isDisabled) return;
+        if (to) {
+            e.preventDefault();
+            navigate(to);
+        }
+        onClick();
+    };
+
+    const content = (
+        <>
             <span className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</span>
             <span className={`ml-4 font-medium whitespace-nowrap transition-all duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 -translate-x-4 w-0 overflow-hidden'}`}>
                 {translatedLabel}
@@ -70,6 +70,42 @@ const NavItem: React.FC<{ icon: React.ReactNode; label: string; isActive: boolea
                     {translatedLabel}
                 </div>
             )}
+        </>
+    );
+
+    const className = `relative flex items-center p-3 my-1.5 rounded-xl transition-all duration-300 group cursor-pointer
+        ${isActive
+            ? 'bg-gradient-to-r from-crimson to-rose-600 text-white shadow-glow'
+            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+        }
+        ${isOpen ? 'justify-start' : 'justify-center'}
+        ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
+
+    if (to && !isDisabled) {
+        return (
+            <li>
+                <Link
+                    to={to}
+                    onClick={handleClick}
+                    className={className}
+                    aria-label={label}
+                >
+                    {content}
+                </Link>
+            </li>
+        );
+    }
+
+    return (
+        <li
+            onClick={handleClick}
+            className={className}
+            role="button"
+            tabIndex={0}
+            aria-label={label}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick() }}
+        >
+            {content}
         </li>
     );
 };
@@ -174,6 +210,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Dashboard"
                 isActive={currentView === 'dashboard' || currentView === 'course'}
                 isOpen={isOpen}
+                to={viewToPath['dashboard']}
                 onClick={() => onNavigate('dashboard')}
             />
             <NavItem
@@ -181,6 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Calendar"
                 isActive={currentView === 'calendar'}
                 isOpen={isOpen}
+                to={viewToPath['calendar']}
                 onClick={() => onNavigate('calendar')}
             />
             <NavItem
@@ -188,6 +226,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Attend Class"
                 isActive={currentView === 'virtual-class'}
                 isOpen={isOpen}
+                to={viewToPath['virtual-class']}
                 onClick={() => onNavigate('virtual-class')}
             />
             <NavItem
@@ -195,6 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Community"
                 isActive={currentView === 'community'}
                 isOpen={isOpen}
+                to={viewToPath['community']}
                 onClick={() => onNavigate('community')}
             />
             <NavItem
@@ -202,6 +242,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="AI Tutor"
                 isActive={currentView === 'tutor'}
                 isOpen={isOpen}
+                to={viewToPath['tutor']}
                 onClick={() => {
                     onNavigate('tutor');
                     setTutorExpanded(!isTutorExpanded);
@@ -213,6 +254,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Achievements"
                 isActive={currentView === 'profile'}
                 isOpen={isOpen}
+                to={viewToPath['profile']}
                 onClick={() => onNavigate('profile')}
             />
             <NavItem
@@ -220,6 +262,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Career Hub"
                 isActive={currentView === 'jobs'}
                 isOpen={isOpen}
+                to={viewToPath['jobs']}
                 onClick={() => onNavigate('jobs')}
             />
             <NavItem
@@ -227,6 +270,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Virtual Library"
                 isActive={currentView === 'library'}
                 isOpen={isOpen}
+                to={viewToPath['library']}
                 onClick={() => {
                     onNavigate('library');
                     setLibraryExpanded(!isLibraryExpanded);
@@ -243,6 +287,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Dashboard"
                 isActive={currentView === 'instructor-dashboard' || currentView === 'course-builder' || currentView === 'course'}
                 isOpen={isOpen}
+                to={viewToPath['instructor-dashboard']}
                 onClick={() => onNavigate('instructor-dashboard')}
             />
              <NavItem
@@ -250,13 +295,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Community"
                 isActive={currentView === 'community'}
                 isOpen={isOpen}
+                to={viewToPath['community']}
                 onClick={() => onNavigate('community')}
             />
             <NavItem
                 icon={<BookOpen size={20} />}
                 label="My Courses"
-                isActive={false} 
+                isActive={false}
                 isOpen={isOpen}
+                to={viewToPath['instructor-dashboard']}
                 onClick={() => onNavigate('instructor-dashboard')}
             />
             <NavItem
@@ -264,6 +311,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Virtual Library"
                 isActive={currentView === 'library'}
                 isOpen={isOpen}
+                to={viewToPath['library']}
                 onClick={() => {
                     onNavigate('library');
                     setLibraryExpanded(!isLibraryExpanded);
@@ -275,6 +323,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Analytics"
                 isActive={currentView === 'instructor-analytics'}
                 isOpen={isOpen}
+                to={viewToPath['instructor-analytics']}
                 onClick={() => onNavigate('instructor-analytics')}
             />
             <NavItem
@@ -282,6 +331,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Calendar"
                 isActive={currentView === 'calendar'}
                 isOpen={isOpen}
+                to={viewToPath['calendar']}
                 onClick={() => onNavigate('calendar')}
             />
             <NavItem
@@ -289,6 +339,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="AI Architect"
                 isActive={currentView === 'tutor'}
                 isOpen={isOpen}
+                to={viewToPath['tutor']}
                 onClick={() => onNavigate('tutor')}
             />
             <NavItem
@@ -296,6 +347,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Settings"
                 isActive={currentView === 'instructor-settings'}
                 isOpen={isOpen}
+                to={viewToPath['instructor-settings']}
                 onClick={() => onNavigate('instructor-settings')}
             />
         </>
@@ -308,6 +360,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Analytics"
                 isActive={currentView === 'institution-dashboard'}
                 isOpen={isOpen}
+                to={viewToPath['institution-dashboard']}
                 onClick={() => onNavigate('institution-dashboard')}
             />
             <NavItem
@@ -315,6 +368,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Portal"
                 isActive={currentView === 'institution-portal'}
                 isOpen={isOpen}
+                to={viewToPath['institution-portal']}
                 onClick={() => onNavigate('institution-portal')}
             />
             <NavItem
@@ -322,6 +376,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Academy Library"
                 isActive={currentView === 'library'}
                 isOpen={isOpen}
+                to={viewToPath['library']}
                 onClick={() => onNavigate('library')}
             />
             <NavItem
@@ -329,6 +384,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Profile"
                 isActive={currentView === 'institution-profile' || currentView === 'institution-profile-editing'}
                 isOpen={isOpen}
+                to={viewToPath['institution-profile']}
                 onClick={() => onNavigate('institution-profile')}
             />
             <NavItem
@@ -336,6 +392,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Team"
                 isActive={currentView === 'institution-learners'}
                 isOpen={isOpen}
+                to={viewToPath['institution-learners']}
                 onClick={() => onNavigate('institution-learners')}
             />
             <NavItem
@@ -343,6 +400,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="Settings"
                 isActive={currentView === 'institution-settings'}
                 isOpen={isOpen}
+                to={viewToPath['institution-settings']}
                 onClick={() => onNavigate('institution-settings')}
             />
             <NavItem
@@ -350,11 +408,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                 label="AI Architect ⭐"
                 isActive={currentView === 'ai-architect'}
                 isOpen={isOpen}
+                to={viewToPath['ai-architect']}
                 onClick={() => onNavigate('ai-architect')}
             />
         </>
     );
-    
+
     const aiSuiteNav = (
         <>
             {userRole === 'instructor' && (
@@ -363,6 +422,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                     label="AI Tools"
                     isActive={currentView === 'ai-tools'}
                     isOpen={isOpen}
+                    to={viewToPath['ai-tools']}
                     onClick={() => onNavigate('ai-tools')}
                 />
             )}
@@ -372,6 +432,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                     label="Go Live"
                     isActive={currentView === 'virtual-class'}
                     isOpen={isOpen}
+                    to={viewToPath['virtual-class']}
                     onClick={() => onNavigate('virtual-class')}
                 />
             )}
@@ -435,17 +496,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                             label="About Us"
                             isActive={currentView === 'about'}
                             isOpen={isOpen}
+                            to={viewToPath['about']}
                             onClick={() => onNavigate('about')}
                         />
-                            <NavItem
+                        <NavItem
                             icon={<Mail size={20} />}
                             label="Contact"
                             isActive={currentView === 'contact'}
                             isOpen={isOpen}
+                            to={viewToPath['contact']}
                             onClick={() => onNavigate('contact')}
                         />
                     </ul>
-                    
+
                     <div className={`mt-4 pt-4 transition-all duration-300 ${isOpen ? 'block' : 'hidden'}`}>
                         <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
@@ -453,14 +516,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
                             </p>
                             <ul className="space-y-1">
                                 <li>
-                                    <button onClick={() => onNavigate('data-policy')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left">
+                                    <Link to={viewToPath['data-policy']} onClick={() => onNavigate('data-policy')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left block">
                                         {dataPolicyText}
-                                    </button>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <button onClick={() => onNavigate('terms-of-service')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left">
+                                    <Link to={viewToPath['terms-of-service']} onClick={() => onNavigate('terms-of-service')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-crimson transition-colors w-full text-left block">
                                         {termsText}
-                                    </button>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

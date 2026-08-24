@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Course, Lesson, Job, UserProfile, UserSettings, FullInstitutionData, InstructorSettings, UserRole } from './types';
 import { courses as initialCourses, userProfile as initialUserProfile, recommendedJobs, instructorCourses as initialInstructorCourses, fullInstitutionData as initialInstitutionData, userSettings as initialUserSettings, initialInstructorSettings, seekingMentorshipLearners, mentorshipMeetings, instructorSubscriptionTiers, institutionSubscriptionTiers } from './constants';
 import Sidebar from './components/Sidebar';
@@ -53,16 +54,75 @@ import VirtualLibraryView from './components/VirtualLibraryView';
 import CogniSacraInstitutionalLibraryView from './components/CogniSacraInstitutionalLibraryView';
 import { AIArchitectView } from './components/AIArchitectView';
 
-type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
+export type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded' | 'reset-password';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
 type AppState = 'landing' | 'app';
 
+// Map view names to URL paths
+export const viewToPath: Record<View, string> = {
+    'dashboard': '/dashboard',
+    'course': '/course',
+    'tutor': '/tutor',
+    'profile': '/profile',
+    'jobs': '/jobs',
+    'adaptive-quiz': '/adaptive-quiz',
+    'instructor-dashboard': '/instructor/dashboard',
+    'course-builder': '/instructor/course-builder',
+    'course-landing': '/course-landing',
+    'learning': '/learning',
+    'instructor-analytics': '/instructor/analytics',
+    'institution-dashboard': '/institution/dashboard',
+    'community': '/community',
+    'vr-classroom': '/vr-classroom',
+    'institution-learners': '/institution/learners',
+    'institution-settings': '/institution/settings',
+    'project-submission': '/project-submission',
+    'calendar': '/calendar',
+    'profile-editing': '/profile/edit',
+    'profile-settings': '/settings',
+    'institution-profile': '/institution/profile',
+    'institution-profile-editing': '/institution/profile/edit',
+    'instructor-settings': '/instructor/settings',
+    'live-session': '/live-session',
+    'about': '/about',
+    'contact': '/contact',
+    'data-policy': '/data-policy',
+    'terms-of-service': '/terms-of-service',
+    'ai-tools': '/ai-tools',
+    'virtual-class': '/virtual-class',
+    'institution-portal': '/institution/portal',
+    'library': '/library',
+    'ai-architect': '/ai-architect',
+};
+
+// Map URL paths to view names
+export const pathToView: Record<string, View> = Object.entries(viewToPath).reduce((acc, [view, path]) => {
+    acc[path] = view as View;
+    return acc;
+}, {} as Record<string, View>);
+
+// Auth-related paths
+export const authPaths = {
+    signin: '/signin',
+    register: '/register',
+    forgotPassword: '/forgot-password',
+    resetPassword: '/reset-password',
+    verifyEmail: '/verify-email',
+};
+
 const App: React.FC = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const [appState, setAppState] = useState<AppState>('app');
     const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('loaded');
-    const [currentView, setCurrentView] = useState<View>('course-landing');
+    const [currentView, setCurrentView] = useState<View>(() => {
+        // Initialize currentView from URL path
+        const path = window.location.pathname;
+        return pathToView[path] || 'dashboard';
+    });
     const [userRole, setUserRole] = useState<UserRole>('learner');
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourses.find(c => c.id === 'react-mastery') || null);
     const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
@@ -94,14 +154,33 @@ const App: React.FC = () => {
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [resetToken, setResetToken] = useState<string | null>(null);
 
-     useEffect(() => {
+    useEffect(() => {
         if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     }, [theme]);
-    
+
+    // Sync currentView with URL path changes (browser back/forward buttons)
+    useEffect(() => {
+        const path = location.pathname;
+        const viewFromPath = pathToView[path];
+        if (viewFromPath && viewFromPath !== currentView) {
+            setCurrentView(viewFromPath);
+        }
+        // Handle tab parameter for library and tutor views
+        const searchParams = new URLSearchParams(location.search);
+        const tab = searchParams.get('tab');
+        if (tab) {
+            if (viewFromPath === 'library') {
+                setLibraryActiveTab(tab);
+            } else if (viewFromPath === 'tutor') {
+                setTutorActiveTab(tab);
+            }
+        }
+    }, [location.pathname, location.search]);
+
     // Backend Auth Session Check
     useEffect(() => {
         const initSession = async () => {
@@ -154,12 +233,36 @@ const App: React.FC = () => {
                 const user = await authService.getCurrentUser();
                 if (user) {
                     setSession({ user: { id: user.id, email: user.email, user_metadata: { full_name: user.name } } });
-                    // Try to fetch profile from Supabase for onboarding state (keep existing profile logic)
-                    const profile = await fetchUserProfile(user.id);
-                    if (profile?.onboarding_completed) {
+
+                    // Update profile data from backend user
+                    setUserProfileData((prev: UserProfile) => ({
+                        ...prev,
+                        name: user.name || prev.name,
+                        avatarUrl: user.avatar_url || `https://i.pravatar.cc/150?u=${user.email}`,
+                    }));
+
+                    // Set role from backend
+                    if (user.role) {
+                        let mappedRole: UserRole = 'learner';
+                        if (user.role === 'instructor') {
+                            mappedRole = 'instructor';
+                        } else if (user.role === 'institution' || user.role === 'institution_admin') {
+                            mappedRole = 'institution';
+                        }
+                        setUserRole(mappedRole);
+                    }
+
+                    // If user has a role from backend (not just 'user'), they've completed onboarding
+                    if (user.role && user.role !== 'user') {
                         setOnboardingStep('loaded');
                     } else {
-                        setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                        // Fallback to Supabase profile for legacy users
+                        const profile = await fetchUserProfile(user.id);
+                        if (profile?.onboarding_completed) {
+                            setOnboardingStep('loaded');
+                        } else {
+                            setOnboardingStep(profile?.onboarding_step || 'role-selection');
+                        }
                     }
                 } else {
                     setOnboardingStep('splash');
@@ -222,7 +325,7 @@ const App: React.FC = () => {
         return () => unsubscribe();
     }, []);
 
-    const fetchUserProfile = async (userId: string) => {
+    const fetchUserProfile = async (userId: string): Promise<{ onboarding_completed?: boolean; onboarding_step?: OnboardingStep; role?: UserRole } | null> => {
         try {
             // 1. Fetch Basic Profile
             const { data: profile, error: profileError } = await supabase
@@ -233,7 +336,7 @@ const App: React.FC = () => {
 
             if (profileError || !profile) {
                 console.warn("Error fetching profile:", profileError?.message);
-                return;
+                return null;
             }
 
             const currentRole = profile.role as UserRole;
@@ -332,10 +435,15 @@ const App: React.FC = () => {
                 }
             }
 
+            return {
+                onboarding_completed: profile.onboarding_completed,
+                onboarding_step: profile.onboarding_step,
+                role: currentRole
+            };
         } catch (err) {
             console.error("Profile fetch error:", err);
+            return null;
         }
-        return null;
     };
 
     const handleSetAppState = (state: AppState) => {
@@ -391,6 +499,25 @@ const App: React.FC = () => {
     }, [allCoursesForLearner, learnerInterests, userRole]);
 
 
+    // Helper function to navigate to a view and update URL
+    const navigateToView = useCallback((view: View, options?: { subTab?: string; replace?: boolean }) => {
+        setCurrentView(view);
+        const path = viewToPath[view];
+        const fullPath = options?.subTab ? `${path}?tab=${options.subTab}` : path;
+        if (options?.replace) {
+            navigate(fullPath, { replace: true });
+        } else {
+            navigate(fullPath);
+        }
+
+        if (view === 'library' && options?.subTab) {
+            setLibraryActiveTab(options.subTab);
+        }
+        if (view === 'tutor' && options?.subTab) {
+            setTutorActiveTab(options.subTab);
+        }
+    }, [navigate]);
+
     const handleLogout = useCallback(async () => {
         try {
             authService.logout();
@@ -401,7 +528,7 @@ const App: React.FC = () => {
         }
         handleSetAppState('landing');
         setOnboardingStep('splash');
-        setCurrentView('dashboard');
+        navigateToView('dashboard');
         setUserRole('learner'); // Reset to a default
         setSelectedCourse(null);
         setCurrentLesson(null);
@@ -413,58 +540,52 @@ const App: React.FC = () => {
         setCompletionModalOpen(false);
         setInstitutionSubscriptionPlan(null);
         setInstructorSubscriptionPlan(null);
-    }, []);
+    }, [navigateToView]);
 
     const handleSelectCourse = useCallback((course: Course) => {
         setSelectedCourse(course);
         if (course.progress === 0 && userRole === 'learner') {
-            setCurrentView('course-landing');
+            navigateToView('course-landing');
         } else {
-            setCurrentView('course');
+            navigateToView('course');
         }
-    }, [userRole]);
+    }, [userRole, navigateToView]);
 
     const handleEnrollCourse = useCallback((courseToEnroll: Course) => {
-        setCourses(prevCourses => prevCourses.map(c => 
+        setCourses(prevCourses => prevCourses.map(c =>
             c.id === courseToEnroll.id ? { ...c, progress: 1 } : c
         ));
         setSelectedCourse(prev => prev ? { ...prev, progress: 1 } : courseToEnroll);
-        setCurrentView('course');
-    }, []);
+        navigateToView('course');
+    }, [navigateToView]);
 
     const handleNavigate = useCallback((view: View, subTab?: string) => {
         if (window.innerWidth < 1024) {
             setSidebarOpen(false);
         }
-        setCurrentView(view);
-        if (view === 'library' && subTab) {
-            setLibraryActiveTab(subTab);
-        }
-        if (view === 'tutor' && subTab) {
-            setTutorActiveTab(subTab);
-        }
-    }, []);
+        navigateToView(view, { subTab });
+    }, [navigateToView]);
 
     const handleStartLesson = useCallback((lesson: Lesson, course: Course) => {
         setSelectedCourse(course);
         if (lesson.format === 'adaptive-quiz') {
             setCurrentQuiz(lesson);
-            setCurrentView('adaptive-quiz');
+            navigateToView('adaptive-quiz');
         } else if (lesson.format === 'metaverse') {
             setCurrentLesson(lesson);
-            setCurrentView('vr-classroom');
+            navigateToView('vr-classroom');
         } else if (lesson.format === 'project') {
             setCurrentLesson(lesson);
-            setCurrentView('project-submission');
+            navigateToView('project-submission');
         } else if (lesson.format === 'live-session') {
             setCurrentLesson(lesson);
-            setCurrentView('live-session');
+            navigateToView('live-session');
         }
         else {
             setCurrentLesson(lesson);
-            setCurrentView('learning');
+            navigateToView('learning');
         }
-    }, []);
+    }, [navigateToView]);
 
     const handleCompleteLesson = useCallback((lessonToComplete: Lesson) => {
         const updateLessonStatus = (courseList: Course[]) => courseList.map(c => {
@@ -578,12 +699,12 @@ const App: React.FC = () => {
             setOnboardingStep('personalization');
         } else if (role === 'institution') {
             setOnboardingStep('loaded');
-            setCurrentView('institution-dashboard');
+            navigateToView('institution-dashboard');
         } else { // instructor
             setOnboardingStep('loaded');
-            setCurrentView('instructor-dashboard');
+            navigateToView('instructor-dashboard');
         }
-    }, [session]);
+    }, [session, navigateToView]);
 
     const handlePersonalizationComplete = useCallback((interests: string[]) => {
         setLearnerInterests(interests);
@@ -630,9 +751,9 @@ const App: React.FC = () => {
             price: 0,
         };
         setEditingCourse(newCourse);
-        setCurrentView('course-builder');
-    }, [userProfileData.name]);
-    
+        navigateToView('course-builder');
+    }, [userProfileData.name, navigateToView]);
+
     const handleCreateInstitutionCourse = useCallback(() => {
         const newCourse: Course = {
             id: `course-${Date.now()}`,
@@ -651,13 +772,13 @@ const App: React.FC = () => {
             status: 'active',
         };
         setEditingCourse(newCourse);
-        setCurrentView('course-builder');
-    }, [institutionData]);
+        navigateToView('course-builder');
+    }, [institutionData, navigateToView]);
 
     const handleEditCourse = useCallback((course: Course) => {
         setEditingCourse(course);
-        setCurrentView('course-builder');
-    }, []);
+        navigateToView('course-builder');
+    }, [navigateToView]);
 
     const handleSaveCourse = useCallback((updatedCourse: Course) => {
         if (userRole === 'instructor') {
@@ -670,7 +791,7 @@ const App: React.FC = () => {
                 }
                 return [...prev, updatedCourse];
             });
-            setCurrentView('instructor-dashboard');
+            navigateToView('instructor-dashboard');
         } else if (userRole === 'institution') {
             setInstitutionData(prev => {
                 const existingCourses = prev.courses || [];
@@ -684,24 +805,47 @@ const App: React.FC = () => {
                 }
                 return { ...prev, courses: newCourses };
             });
-            setCurrentView('institution-dashboard');
+            navigateToView('institution-dashboard');
         }
         setEditingCourse(null);
-    }, [userRole]);
+    }, [userRole, navigateToView]);
 
     const handleViewAnalytics = useCallback((course: Course) => {
         setAnalyticsCourse(course);
-        setCurrentView('instructor-analytics');
-    }, []);
+        navigateToView('instructor-analytics');
+    }, [navigateToView]);
 
     const handleNavigateToEditProfile = useCallback(() => {
-        setCurrentView('profile-editing');
-    }, []);
+        navigateToView('profile-editing');
+    }, [navigateToView]);
 
-    const handleSaveProfile = useCallback((updatedProfile: UserProfile) => {
+    const handleSaveProfile = useCallback(async (updatedProfile: UserProfile) => {
         setUserProfileData(updatedProfile);
-        
-        // Sync to Supabase
+
+        // Sync to backend API
+        if (authService.isAuthenticated()) {
+            try {
+                await authService.updateProfile({
+                    name: updatedProfile.name,
+                    username: updatedProfile.username,
+                    bio: updatedProfile.bio,
+                    avatar_url: updatedProfile.avatarUrl,
+                    cover_image_url: updatedProfile.coverImageUrl,
+                    title: updatedProfile.title,
+                    location_city: updatedProfile.location?.city,
+                    location_country: updatedProfile.location?.country,
+                    skills: updatedProfile.skills,
+                    social_links: updatedProfile.socialLinks,
+                    learning_goals: updatedProfile.learningGoals,
+                    mentorship_status: updatedProfile.mentorshipStatus,
+                    target_career: updatedProfile.targetCareer
+                });
+            } catch (error) {
+                console.error("Error saving profile to API:", error);
+            }
+        }
+
+        // Also sync to Supabase for backward compatibility
         if (session) {
             const updates: any = {
                 username: updatedProfile.username,
@@ -714,7 +858,7 @@ const App: React.FC = () => {
                 learning_goals: updatedProfile.learningGoals,
                 target_career: updatedProfile.targetCareer
             };
-            
+
             // Also update main profile table for name/avatar
             supabase.from('profiles').update({
                 full_name: updatedProfile.name,
@@ -726,23 +870,23 @@ const App: React.FC = () => {
             });
         }
 
-        setCurrentView('profile');
-    }, [session]);
-    
+        navigateToView('profile');
+    }, [session, navigateToView]);
+
     const handleSaveInstitutionProfile = useCallback((updatedData: FullInstitutionData) => {
         setInstitutionData(updatedData);
-        setCurrentView('institution-profile');
-    }, []);
+        navigateToView('institution-profile');
+    }, [navigateToView]);
 
     const handleNavigateToSettings = useCallback(() => {
         if (userRole === 'learner') {
-            setCurrentView('profile-settings');
+            navigateToView('profile-settings');
         } else if (userRole === 'instructor') {
-            setCurrentView('instructor-settings');
+            navigateToView('instructor-settings');
         } else if (userRole === 'institution') {
-            setCurrentView('institution-settings');
+            navigateToView('institution-settings');
         }
-    }, [userRole]);
+    }, [userRole, navigateToView]);
 
     const handleToggleBookmark = useCallback((courseId: string) => {
         setBookmarkedCourseIds(prev => {
@@ -774,10 +918,10 @@ const App: React.FC = () => {
                 />;
             case 'course-landing':
                 return selectedCourse ? (
-                    <CourseLandingPage 
-                        course={selectedCourse} 
-                        onEnroll={handleEnrollCourse} 
-                        onBack={() => setCurrentView('dashboard')}
+                    <CourseLandingPage
+                        course={selectedCourse}
+                        onEnroll={handleEnrollCourse}
+                        onBack={() => navigateToView('dashboard')}
                         userProfile={userProfileData}
                     />
                 ) : (
@@ -794,9 +938,9 @@ const App: React.FC = () => {
                 );
             case 'course':
                 return selectedCourse ? (
-                    <CourseDetailView 
-                        course={selectedCourse} 
-                        onBack={() => setCurrentView(userRole === 'instructor' ? 'instructor-dashboard' : (userRole === 'institution' ? 'institution-dashboard' : 'dashboard'))} 
+                    <CourseDetailView
+                        course={selectedCourse}
+                        onBack={() => navigateToView(userRole === 'instructor' ? 'instructor-dashboard' : (userRole === 'institution' ? 'institution-dashboard' : 'dashboard'))}
                         onStartLesson={(lesson) => handleStartLesson(lesson, selectedCourse)}
                         allCourses={allCoursesForLearner}
                         onSelectCourse={handleSelectCourse}
@@ -817,10 +961,10 @@ const App: React.FC = () => {
                 );
             case 'learning':
                  return currentLesson && selectedCourse ? (
-                    <LearningView 
-                        course={selectedCourse} 
-                        lesson={currentLesson} 
-                        onBack={() => setCurrentView('course')} 
+                    <LearningView
+                        course={selectedCourse}
+                        lesson={currentLesson}
+                        onBack={() => navigateToView('course')}
                         onCompleteLesson={handleCompleteLesson}
                         onNavigateLesson={(lesson) => handleStartLesson(lesson, selectedCourse)}
                     />
@@ -838,10 +982,10 @@ const App: React.FC = () => {
                 );
             case 'live-session':
                  return currentLesson && selectedCourse ? (
-                    <LiveSessionView 
-                        course={selectedCourse} 
-                        lesson={currentLesson} 
-                        onBack={() => setCurrentView('course')} 
+                    <LiveSessionView
+                        course={selectedCourse}
+                        lesson={currentLesson}
+                        onBack={() => navigateToView('course')}
                     />
                 ) : (
                     <Dashboard 
@@ -869,9 +1013,9 @@ const App: React.FC = () => {
             case 'project-submission':
                  return currentLesson && selectedCourse ? (
                     <ProjectSubmissionView
-                        course={selectedCourse} 
-                        lesson={currentLesson} 
-                        onBack={() => setCurrentView('course')} 
+                        course={selectedCourse}
+                        lesson={currentLesson}
+                        onBack={() => navigateToView('course')}
                     />
                 ) : (
                     <Dashboard 
@@ -906,7 +1050,7 @@ const App: React.FC = () => {
                 return <ProfileEditingView
                     userProfile={userProfileData}
                     onSave={handleSaveProfile}
-                    onBack={() => setCurrentView('profile')}
+                    onBack={() => navigateToView('profile')}
                 />;
              case 'profile-settings':
                 return <ProfileSettingsView
@@ -925,7 +1069,7 @@ const App: React.FC = () => {
                 return <CalendarView courses={allCoursesForLearner} mentorshipMeetings={mentorshipMeetings} />;
             case 'adaptive-quiz':
                 return currentQuiz && selectedCourse ? (
-                     <AdaptiveQuizView course={selectedCourse} quizLesson={currentQuiz} onBack={() => setCurrentView('course')} />
+                     <AdaptiveQuizView course={selectedCourse} quizLesson={currentQuiz} onBack={() => navigateToView('course')} />
                 ) : (
                      <Dashboard 
                         courses={personalizedCourses} 
@@ -957,15 +1101,15 @@ const App: React.FC = () => {
                     subscriptionPlan={instructorSubscriptionPlan}
                     rejoinSession={rejoinSession}
                     onRejoinSession={() => {
-                        setCurrentView('virtual-class');
+                        navigateToView('virtual-class');
                     }}
                 />;
             case 'course-builder':
                 return editingCourse ? (
-                    <CourseBuilderView 
-                        initialCourse={editingCourse} 
-                        onSave={handleSaveCourse} 
-                        onBack={() => setCurrentView(userRole === 'instructor' ? 'instructor-dashboard' : 'institution-dashboard')}
+                    <CourseBuilderView
+                        initialCourse={editingCourse}
+                        onSave={handleSaveCourse}
+                        onBack={() => navigateToView(userRole === 'instructor' ? 'instructor-dashboard' : 'institution-dashboard')}
                         userRole={userRole}
                         faculty={institutionData.profile.faculty}
                     />
@@ -976,7 +1120,7 @@ const App: React.FC = () => {
                 );
             case 'instructor-analytics':
                  return analyticsCourse ? (
-                    <InstructorAnalyticsView course={analyticsCourse} onBack={() => setCurrentView('instructor-dashboard')} />
+                    <InstructorAnalyticsView course={analyticsCourse} onBack={() => navigateToView('instructor-dashboard')} />
                 ) : (
                      <InstructorDashboardView courses={instructorCourses} onCreateCourse={handleCreateCourse} onEditCourse={handleEditCourse} onViewCourse={handleSelectCourse} onViewAnalytics={handleViewAnalytics} seekingMentorshipLearners={seekingMentorshipLearners} subscriptionPlan={instructorSubscriptionPlan} />
                 );
@@ -1003,9 +1147,9 @@ const App: React.FC = () => {
             case 'institution-settings':
                 return <InstitutionSettingsView institutionData={institutionData} onSave={setInstitutionData} />;
             case 'institution-profile':
-                return <InstitutionProfileView institutionData={institutionData} onNavigate={() => setCurrentView('institution-profile-editing')} />;
+                return <InstitutionProfileView institutionData={institutionData} onNavigate={() => navigateToView('institution-profile-editing')} />;
             case 'institution-profile-editing':
-                return <InstitutionProfileEditingView institutionData={institutionData} onSave={handleSaveInstitutionProfile} onBack={() => setCurrentView('institution-profile')} />;
+                return <InstitutionProfileEditingView institutionData={institutionData} onSave={handleSaveInstitutionProfile} onBack={() => navigateToView('institution-profile')} />;
             case 'about':
                 return <AboutView />;
             case 'contact':
@@ -1024,19 +1168,19 @@ const App: React.FC = () => {
                 return <InstitutionPortalView institutionData={institutionData} />;
             case 'virtual-class':
                 return (
-                    <VirtualClassroomView 
-                        userRole={userRole} 
+                    <VirtualClassroomView
+                        userRole={userRole}
                         rejoinSessionToLoad={rejoinSession}
                         onClearRejoinSession={() => setRejoinSession(null)}
                         onLeaveClass={(sess) => {
                             if (userRole === 'instructor') {
                                 setRejoinSession(sess);
-                                setCurrentView('instructor-dashboard');
+                                navigateToView('instructor-dashboard');
                             } else if (userRole === 'institution') {
                                 setRejoinSession(null);
-                                setCurrentView('virtual-class');
+                                navigateToView('virtual-class');
                             } else {
-                                setCurrentView('dashboard');
+                                navigateToView('dashboard');
                             }
                         }}
                     />

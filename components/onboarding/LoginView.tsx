@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
 import GoogleIcon from '../icons/GoogleIcon';
 import AppleIcon from '../icons/AppleIcon';
@@ -28,8 +28,15 @@ const SocialButton: React.FC<{ icon: React.ReactNode; label: string; onClick: ()
 );
 
 const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
-    const [activeTab, setActiveTab] = useState<AuthTab>('signin');
-    const [mode, setMode] = useState<AuthMode>('auth');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState<AuthTab>(() => {
+        // Check URL to determine initial tab
+        return location.pathname === '/register' ? 'signup' : 'signin';
+    });
+    const [mode, setMode] = useState<AuthMode>(() => {
+        return location.pathname === '/forgot-password' ? 'reset' : 'auth';
+    });
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
@@ -258,13 +265,13 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                                 Remember me
                             </label>
                             {activeTab === 'signin' && (
-                                <button
-                                    type="button"
+                                <Link
+                                    to="/forgot-password"
                                     onClick={() => setMode('reset')}
                                     className="text-sm font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
                                 >
                                     Forgot password?
-                                </button>
+                                </Link>
                             )}
                         </div>
 
@@ -279,7 +286,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
 
                     <p className="text-center text-sm text-gray-600 dark:text-gray-400">
                         {activeTab === 'signin' ? "Don't have an account? " : "Already have an account? "}
-                        <button
+                        <Link
+                            to={activeTab === 'signin' ? '/register' : '/signin'}
                             onClick={() => {
                                 setActiveTab(activeTab === 'signin' ? 'signup' : 'signin');
                                 setErrorMsg(null);
@@ -288,7 +296,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                             className="font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
                         >
                             {activeTab === 'signin' ? 'Sign up' : 'Log in'}
-                        </button>
+                        </Link>
                     </p>
                         </>
                     )}

@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import LinkedInIcon from '../icons/LinkedInIcon';
 import GitHubIcon from '../icons/GitHubIcon';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
-import { LandingView } from './LandingPage';
+import { LandingView, landingViewToPath } from './LandingPage';
 import { Terminal, Database, ShieldCheck, Cpu, GitBranch, Key, Activity } from 'lucide-react';
 
 interface LandingFooterProps {
@@ -10,9 +11,9 @@ interface LandingFooterProps {
 }
 
 const FooterLink: React.FC<{ view: LandingView, setView: (v: LandingView) => void, children: React.ReactNode }> = ({ view, setView, children }) => (
-    <button onClick={() => setView(view)} className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-all duration-300">
+    <Link to={landingViewToPath[view]} onClick={() => setView(view)} className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-all duration-300">
         {children}
-    </button>
+    </Link>
 );
 
 const LandingFooter: React.FC<LandingFooterProps> = ({ setView }) => {
