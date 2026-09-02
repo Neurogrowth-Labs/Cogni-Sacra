@@ -659,56 +659,58 @@ const App: React.FC = () => {
 
     const handleSelectRoleOnboarding = useCallback(async (role: UserRole) => {
         setUserRole(role);
-        
-        const nextOnboardingStep = role === 'learner' ? 'personalization' : 'loaded';
-        const onboardingCompleted = role !== 'learner';
 
+        // For learner, go to personalization first to collect interests
+        if (role === 'learner') {
+            setOnboardingStep('personalization');
+            return;
+        }
+
+        // For instructor/institution, complete onboarding via backend API
+        try {
+            await authService.completeOnboarding({
+                accountType: role,
+                interests: [],
+            });
+        } catch (e) {
+            console.error("Error completing onboarding:", e);
+        }
+
+        // Also update Supabase for backward compatibility
         if (session && session.user) {
             try {
-                // Update role and onboarding progress in profiles table
                 await supabase.from('profiles').update({
                     role: role,
-                    onboarding_step: nextOnboardingStep,
-                    onboarding_completed: onboardingCompleted
+                    onboarding_step: 'loaded',
+                    onboarding_completed: true
                 }).eq('id', session.user.id);
-                
-                // Ensure corresponding table entry exists
-                if (role === 'instructor') {
-                    // Check if entry exists, if not insert
-                    const { data } = await supabase.from('instructors_data').select('id').eq('id', session.user.id).single();
-                    if (!data) {
-                        await supabase.from('instructors_data').insert([{ id: session.user.id }]);
-                    }
-                } else if (role === 'institution') {
-                    const { data } = await supabase.from('institutions_data').select('id').eq('id', session.user.id).single();
-                    if (!data) {
-                        await supabase.from('institutions_data').insert([{ id: session.user.id, name: 'My Institution' }]);
-                    }
-                } else if (role === 'learner') {
-                     const { data } = await supabase.from('learners_data').select('id').eq('id', session.user.id).single();
-                    if (!data) {
-                        await supabase.from('learners_data').insert([{ id: session.user.id }]);
-                    }
-                }
             } catch (e) {
                 console.error("Error updating role in Supabase:", e);
             }
         }
 
-        if (role === 'learner') {
-            setOnboardingStep('personalization');
-        } else if (role === 'institution') {
-            setOnboardingStep('loaded');
+        setOnboardingStep('loaded');
+        if (role === 'institution') {
             navigateToView('institution-dashboard');
-        } else { // instructor
-            setOnboardingStep('loaded');
+        } else {
             navigateToView('instructor-dashboard');
         }
     }, [session, navigateToView]);
 
-    const handlePersonalizationComplete = useCallback((interests: string[]) => {
+    const handlePersonalizationComplete = useCallback(async (interests: string[]) => {
         setLearnerInterests(interests);
-        // Optimistically update local state, and sync to DB
+
+        // Complete onboarding via backend API with learner role and interests
+        try {
+            await authService.completeOnboarding({
+                accountType: 'learner',
+                interests: interests,
+            });
+        } catch (e) {
+            console.error("Error completing onboarding:", e);
+        }
+
+        // Also sync to Supabase for backward compatibility
         if (session) {
             supabase.from('learners_data').update({ skills: interests, interests: interests }).eq('id', session.user.id).then(({ error }) => {
                 if (error) console.error("Error saving interests:", error);

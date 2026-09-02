@@ -74,7 +74,7 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
     };
 
     return (
-        <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 animate-fade-in overflow-hidden">
+        <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 animate-fade-in">
             {/* Left Side - Artistic / Brand */}
             <div className="hidden lg:flex w-1/2 relative bg-gray-900 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
@@ -84,8 +84,8 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
                 <div className="relative z-10 flex flex-col justify-between w-full p-16">
                     <div>
                         <div className="flex items-center gap-3">
-                            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                                <CogniSacraLogo className="w-8 h-8" />
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur-md border border-white/10">
+                                <CogniSacraLogo className="w-full h-full" />
                             </div>
                             <span className="text-2xl font-bold text-white font-serif tracking-tight">CogniSacra Academy</span>
                         </div>
@@ -115,8 +115,8 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900">
-                <div className="w-full max-w-md space-y-10">
+            <div className="w-full lg:w-1/2 flex justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900 overflow-y-auto">
+                <div className="w-full max-w-md space-y-10 my-auto">
                     {mode === 'reset' ? (
                         <PasswordResetView onBack={() => setMode('auth')} />
                     ) : (
@@ -135,6 +135,18 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
                                 <SocialButton icon={<GoogleIcon />} label="Google" onClick={() => handleSocialLogin('google')} />
                                 <SocialButton icon={<AppleIcon className="text-gray-900 dark:text-white" />} label="Apple" onClick={() => handleSocialLogin('apple')} />
                                 <SocialButton icon={<LinkedInIcon />} label="LinkedIn" onClick={() => handleSocialLogin('linkedin')} />
+                            </div>
+
+                            {/* F6S Logo */}
+                            <div className="flex justify-center">
+                                <a
+                                    href="https://www.f6s.com/cognisacra"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <img src="/f6s.jpeg" alt="F6S" className="h-6 w-auto object-contain" />
+                                </a>
                             </div>
 
                             <div className="relative">

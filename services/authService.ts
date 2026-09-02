@@ -57,6 +57,11 @@ export interface UpdateProfilePayload {
   target_career?: string;
 }
 
+export interface CompleteOnboardingPayload {
+  accountType: 'learner' | 'instructor' | 'institution';
+  interests?: string[];
+}
+
 export interface AuthUser {
   id: string;
   name: string;
@@ -275,6 +280,41 @@ export const authService = {
         throw new Error('Session expired. Please login again.');
       }
       throw new Error(apiResponse.message || 'Failed to change password');
+    }
+
+    return apiResponse.message;
+  },
+
+  // Complete onboarding
+  async completeOnboarding(payload: CompleteOnboardingPayload): Promise<string> {
+    const token = this.getToken();
+    if (!token) throw new Error('Not authenticated');
+
+    const response = await fetch(`${API_BASE_URL}/account/onboarding`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const apiResponse: ApiResponse = await response.json();
+
+    if (!response.ok || !apiResponse.success) {
+      if (response.status === 401) {
+        this.logout();
+        throw new Error('Session expired. Please login again.');
+      }
+      throw new Error(apiResponse.message || 'Failed to complete onboarding');
+    }
+
+    // Update local user with new role
+    const currentUser = this.getUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, role: payload.accountType };
+      this.saveUser(updatedUser);
+      notifyListeners('TOKEN_REFRESHED', updatedUser);
     }
 
     return apiResponse.message;

@@ -48,8 +48,8 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-20">
                     <Link to="/" className="flex-shrink-0 flex items-center space-x-3 cursor-pointer" onClick={() => setView('home')}>
-                        <div className="p-1.5 bg-gradient-to-tr from-red-600 to-rose-500 rounded-xl shadow-[0_4px_15px_rgba(239,68,68,0.2)]">
-                            <CogniSacraLogo className="w-8 h-8 text-white" />
+                        <div className="w-10 h-10 rounded-xl overflow-hidden shadow-[0_4px_15px_rgba(239,68,68,0.2)]">
+                            <CogniSacraLogo className="w-full h-full" />
                         </div>
                         <span className="font-extrabold text-lg sm:text-xl font-sans tracking-wider text-slate-900 flex items-center gap-1">
                             CogniSacra<span className="text-red-600">™</span>
@@ -63,7 +63,7 @@ const LandingHeader: React.FC<LandingHeaderProps> = ({ currentView, setView, onG
                         ))}
                     </div>
                     <div className="hidden md:flex items-center space-x-3">
-                         <Link to="/signin" onClick={onGetStarted} className="px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-red-650 to-red-500 hover:from-red-500 hover:to-red-650 rounded-full shadow-[0_4px_15px_rgba(239,68,68,0.25)] hover:shadow-[0_6px_25px_rgba(239,68,68,0.4)] transition-all duration-300 transform hover:-translate-y-0.5">
+                         <Link to="/signin" onClick={onGetStarted} className="px-6 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-crimson to-rose-600 hover:from-rose-600 hover:to-crimson rounded-full shadow-[0_4px_15px_rgba(165,28,48,0.3)] hover:shadow-[0_6px_25px_rgba(165,28,48,0.45)] transition-all duration-300 transform hover:-translate-y-0.5">
                             Sign In
                          </Link>
                     </div>

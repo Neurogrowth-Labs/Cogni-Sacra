@@ -162,9 +162,20 @@ const LandingFooter: React.FC<LandingFooterProps> = ({ setView }) => {
                 </div>
 
                 <div className="mt-12 border-t border-rose-100/60 pt-8 flex flex-col sm:flex-row justify-between items-center text-slate-450 gap-4">
-                    <p className="text-xs font-semibold text-slate-400 text-center sm:text-left">
-                        &copy; {new Date().getFullYear()} CogniSacra™ Academic Digital Infrastructure. All rights reserved.
-                    </p>
+                    <div className="flex items-center gap-3">
+                        <p className="text-xs font-semibold text-slate-400 text-center sm:text-left">
+                            &copy; {new Date().getFullYear()} CogniSacra™ Academic Digital Infrastructure. All rights reserved.
+                        </p>
+                        <span className="text-slate-300">•</span>
+                        <a
+                            href="https://www.f6s.com/cognisacra"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:opacity-70 transition-opacity"
+                        >
+                            <img src="/f6s.jpeg" alt="F6S" className="h-5 w-auto object-contain" />
+                        </a>
+                    </div>
                     <div className="flex gap-4 text-xs font-mono font-bold">
                         <a href="#" className="text-slate-405 hover:text-red-600 transition">Legals</a>
                         <span className="text-slate-300">|</span>
