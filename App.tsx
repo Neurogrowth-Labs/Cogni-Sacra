@@ -16,6 +16,7 @@ import InstructorDashboardView from './components/InstructorDashboardView';
 import CourseBuilderView from './components/CourseBuilderView';
 import SplashScreen from './components/onboarding/SplashScreen';
 import LoginView from './components/onboarding/LoginView';
+import CogniSacraLogo from './components/icons/IntelliLearnLogo';
 import RoleSelectionView from './components/onboarding/RoleSelectionView';
 import PersonalizationView from './components/onboarding/PersonalizationView';
 import WelcomeAssistantView from './components/onboarding/WelcomeAssistantView';
@@ -53,8 +54,12 @@ import type { AuthUser } from './services/authService';
 import VirtualLibraryView from './components/VirtualLibraryView';
 import CogniSacraInstitutionalLibraryView from './components/CogniSacraInstitutionalLibraryView';
 import { AIArchitectView } from './components/AIArchitectView';
+import AdminDashboardView from './components/admin/AdminDashboardView';
+import AdminUsersView from './components/admin/AdminUsersView';
+import AdminCoursesView from './components/admin/AdminCoursesView';
+import AdminLibraryView from './components/admin/AdminLibraryView';
 
-export type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect';
+export type View = 'dashboard' | 'course' | 'tutor' | 'profile' | 'jobs' | 'adaptive-quiz' | 'instructor-dashboard' | 'course-builder' | 'course-landing' | 'learning' | 'instructor-analytics' | 'institution-dashboard' | 'community' | 'vr-classroom' | 'institution-learners' | 'institution-settings' | 'project-submission' | 'calendar' | 'profile-editing' | 'profile-settings' | 'institution-profile' | 'institution-profile-editing' | 'instructor-settings' | 'live-session' | 'about' | 'contact' | 'data-policy' | 'terms-of-service' | 'ai-tools' | 'virtual-class' | 'institution-portal' | 'library' | 'ai-architect' | 'admin-dashboard' | 'admin-users' | 'admin-courses' | 'admin-library' | 'admin-analytics' | 'admin-settings';
 type OnboardingStep = 'splash' | 'auth' | 'role-selection' | 'personalization' | 'welcome' | 'loaded' | 'reset-password';
 type Theme = 'light' | 'dark';
 type TextSize = 'base' | 'lg' | 'xl';
@@ -95,6 +100,12 @@ export const viewToPath: Record<View, string> = {
     'institution-portal': '/institution/portal',
     'library': '/library',
     'ai-architect': '/ai-architect',
+    'admin-dashboard': '/admin/dashboard',
+    'admin-users': '/admin/users',
+    'admin-courses': '/admin/courses',
+    'admin-library': '/admin/library',
+    'admin-analytics': '/admin/analytics',
+    'admin-settings': '/admin/settings',
 };
 
 // Map URL paths to view names
@@ -153,6 +164,8 @@ const App: React.FC = () => {
     const [tutorActiveTab, setTutorActiveTab] = useState<string>('ask-tutor');
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [resetToken, setResetToken] = useState<string | null>(null);
+
+    // Platform Admin State - now fetched from API in each component
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -244,7 +257,9 @@ const App: React.FC = () => {
                     // Set role from backend
                     if (user.role) {
                         let mappedRole: UserRole = 'learner';
-                        if (user.role === 'instructor') {
+                        if (user.role === 'platform_admin') {
+                            mappedRole = 'platform_admin';
+                        } else if (user.role === 'instructor') {
                             mappedRole = 'instructor';
                         } else if (user.role === 'institution' || user.role === 'institution_admin') {
                             mappedRole = 'institution';
@@ -292,7 +307,9 @@ const App: React.FC = () => {
                 // Set role from backend (map backend roles to frontend roles)
                 if (user.role) {
                     let mappedRole: UserRole = 'learner';
-                    if (user.role === 'instructor') {
+                    if (user.role === 'platform_admin') {
+                        mappedRole = 'platform_admin';
+                    } else if (user.role === 'instructor') {
                         mappedRole = 'instructor';
                     } else if (user.role === 'institution' || user.role === 'institution_admin') {
                         mappedRole = 'institution';
@@ -627,7 +644,9 @@ const App: React.FC = () => {
             // Set role from backend (map backend roles to frontend roles)
             if (user.role) {
                 let mappedRole: UserRole = 'learner';
-                if (user.role === 'instructor') {
+                if (user.role === 'platform_admin') {
+                    mappedRole = 'platform_admin';
+                } else if (user.role === 'instructor') {
                     mappedRole = 'instructor';
                 } else if (user.role === 'institution' || user.role === 'institution_admin') {
                     mappedRole = 'institution';
@@ -636,6 +655,13 @@ const App: React.FC = () => {
                     mappedRole = 'learner';
                 }
                 setUserRole(mappedRole);
+
+                // For platform_admin, skip onboarding and go directly to admin dashboard
+                if (mappedRole === 'platform_admin') {
+                    setOnboardingStep('loaded');
+                    navigateToView('admin-dashboard');
+                    return;
+                }
             }
 
             // If user already has a role from backend, they're past onboarding
@@ -655,7 +681,7 @@ const App: React.FC = () => {
         } else {
             setOnboardingStep('role-selection');
         }
-    }, []);
+    }, [navigateToView]);
 
     const handleSelectRoleOnboarding = useCallback(async (role: UserRole) => {
         setUserRole(role);
@@ -1187,6 +1213,19 @@ const App: React.FC = () => {
                         }}
                     />
                 );
+            // Platform Admin Views
+            case 'admin-dashboard':
+                return <AdminDashboardView onNavigate={navigateToView} />;
+            case 'admin-users':
+                return <AdminUsersView />;
+            case 'admin-courses':
+                return <AdminCoursesView onViewCourse={(courseId: string) => console.log('View course:', courseId)} />;
+            case 'admin-library':
+                return <AdminLibraryView onViewItem={(itemId: string) => console.log('View item:', itemId)} />;
+            case 'admin-analytics':
+                return <AdminDashboardView onNavigate={navigateToView} />;
+            case 'admin-settings':
+                return <AdminDashboardView onNavigate={navigateToView} />;
             default:
                 return <Dashboard 
                     courses={personalizedCourses} 
@@ -1238,7 +1277,17 @@ const App: React.FC = () => {
         if (!isAuthReady) {
             return (
                 <div className="h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                    <div className="animate-pulse text-crimson font-serif text-2xl">CogniSacra Academy</div>
+                    <div className="flex flex-col items-center animate-pulse">
+                        <CogniSacraLogo className="w-40 h-40" />
+                        <a
+                            href="https://www.f6s.com/cognisacra"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-8 hover:opacity-80 transition-opacity"
+                        >
+                            <img src="/f6s.jpeg" alt="F6S" className="h-8 w-auto object-contain" />
+                        </a>
+                    </div>
                 </div>
             );
         }

@@ -58,7 +58,7 @@ export interface UpdateProfilePayload {
 }
 
 export interface CompleteOnboardingPayload {
-  accountType: 'learner' | 'instructor' | 'institution';
+  accountType: 'learner' | 'instructor' | 'institution' | 'platform_admin';
   interests?: string[];
 }
 

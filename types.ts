@@ -2,7 +2,53 @@
 import React from 'react';
 
 export type LessonFormat = 'video' | 'reading' | 'quiz' | 'adaptive-quiz' | 'project' | 'live-session' | 'metaverse';
-export type UserRole = 'learner' | 'instructor' | 'institution';
+export type UserRole = 'learner' | 'instructor' | 'institution' | 'platform_admin';
+
+// Platform Admin types
+export interface PlatformUser {
+    id: string;
+    name: string;
+    email: string;
+    role: 'independent_learner' | 'instructor' | 'institution_admin' | 'platform_admin';
+    status: 'active' | 'suspended' | 'pending';
+    isEmailVerified: boolean;
+    createdAt: string;
+    lastLogin?: string;
+}
+
+export interface PlatformCourse {
+    id: string;
+    title: string;
+    instructor: string;
+    instructorId: string;
+    status: 'draft' | 'published' | 'archived' | 'pending_review';
+    enrollments: number;
+    rating: number;
+    createdAt: string;
+    category: string;
+}
+
+export interface PlatformLibraryItem {
+    id: string;
+    title: string;
+    type: 'book' | 'article' | 'video' | 'document';
+    author: string;
+    uploadedBy: string;
+    status: 'published' | 'pending' | 'rejected';
+    downloads: number;
+    createdAt: string;
+}
+
+export interface PlatformStats {
+    totalUsers: number;
+    activeUsers: number;
+    totalCourses: number;
+    publishedCourses: number;
+    totalLibraryItems: number;
+    totalRevenue: number;
+    newUsersThisMonth: number;
+    newCoursesThisMonth: number;
+}
 
 export interface DiscussionPost {
   id: string;

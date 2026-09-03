@@ -21,7 +21,7 @@ import { LiveClassroomRoom } from './virtual-classroom/LiveClassroomRoom';
 import { sendMessageToAI } from '../services/geminiService';
 
 interface VirtualClassroomViewProps {
-  userRole?: 'learner' | 'instructor' | 'institution';
+  userRole?: 'learner' | 'instructor' | 'institution' | 'platform_admin';
   onLeaveClass?: (session: ClassSession) => void;
   rejoinSessionToLoad?: ClassSession | null;
   onClearRejoinSession?: () => void;

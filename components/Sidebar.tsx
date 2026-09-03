@@ -30,7 +30,11 @@ import {
     Award,
     MessageSquare,
     Mic,
-    Upload
+    Upload,
+    Shield,
+    GraduationCap,
+    Library,
+    UserCog
 } from 'lucide-react';
 
 type NavView = View;
@@ -414,6 +418,59 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
         </>
     );
 
+    const platformAdminNav = (
+        <>
+            <NavItem
+                icon={<Shield size={20} />}
+                label="Admin Dashboard"
+                isActive={currentView === 'admin-dashboard'}
+                isOpen={isOpen}
+                to={viewToPath['admin-dashboard']}
+                onClick={() => onNavigate('admin-dashboard')}
+            />
+            <NavItem
+                icon={<UserCog size={20} />}
+                label="User Management"
+                isActive={currentView === 'admin-users'}
+                isOpen={isOpen}
+                to={viewToPath['admin-users']}
+                onClick={() => onNavigate('admin-users')}
+            />
+            <NavItem
+                icon={<GraduationCap size={20} />}
+                label="Course Management"
+                isActive={currentView === 'admin-courses'}
+                isOpen={isOpen}
+                to={viewToPath['admin-courses']}
+                onClick={() => onNavigate('admin-courses')}
+            />
+            <NavItem
+                icon={<Library size={20} />}
+                label="Library Management"
+                isActive={currentView === 'admin-library'}
+                isOpen={isOpen}
+                to={viewToPath['admin-library']}
+                onClick={() => onNavigate('admin-library')}
+            />
+            <NavItem
+                icon={<BarChart3 size={20} />}
+                label="Platform Analytics"
+                isActive={currentView === 'admin-analytics'}
+                isOpen={isOpen}
+                to={viewToPath['admin-analytics']}
+                onClick={() => onNavigate('admin-analytics')}
+            />
+            <NavItem
+                icon={<Settings size={20} />}
+                label="Platform Settings"
+                isActive={currentView === 'admin-settings'}
+                isOpen={isOpen}
+                to={viewToPath['admin-settings']}
+                onClick={() => onNavigate('admin-settings')}
+            />
+        </>
+    );
+
     const aiSuiteNav = (
         <>
             {userRole === 'instructor' && (
@@ -444,6 +501,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onNavigate, currentView, setS
             case 'learner': return learnerNav;
             case 'instructor': return instructorNav;
             case 'institution': return institutionNav;
+            case 'platform_admin': return platformAdminNav;
             default: return learnerNav;
         }
     }

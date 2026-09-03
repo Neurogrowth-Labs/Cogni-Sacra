@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
 import EyeIcon from '../icons/EyeIcon';
@@ -14,9 +14,31 @@ interface LoginViewProps {
 type AuthTab = 'signin' | 'signup';
 type AuthMode = 'auth' | 'reset';
 
+const testimonials = [
+    {
+        quote: "CogniSacra has revolutionized the way African students access quality education. The AI-powered learning paths are game-changing.",
+        name: "Amina Okello",
+        role: "Computer Science Student, University of Nairobi",
+        avatar: "amina"
+    },
+    {
+        quote: "Finally, a platform that understands the unique challenges of African education. The offline capabilities are perfect for my students.",
+        name: "Dr. Kwame Mensah",
+        role: "Professor, University of Ghana",
+        avatar: "kwame"
+    },
+    {
+        quote: "The personalized AI tutor feels like having a mentor available 24/7. It's transformed how I approach my studies.",
+        name: "Fatima Diallo",
+        role: "Medical Student, Cheikh Anta Diop University",
+        avatar: "fatima"
+    }
+];
+
 const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const [activeTab, setActiveTab] = useState<AuthTab>(() => {
         // Check URL to determine initial tab
         return location.pathname === '/register' ? 'signup' : 'signin';
@@ -39,6 +61,14 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
             return true;
         }
     });
+
+    // Auto-rotate testimonials
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+        }, 5000); // Change every 5 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,32 +125,46 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-crimson/40 to-blue-900/40"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 
-                <div className="relative z-10 flex flex-col justify-between w-full p-16">
-                    <div>
-                        {/* Large Logo Only - No text */}
-                        <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
-                            <CogniSacraLogo className="w-full h-full" />
-                        </div>
-                    </div>
-
+                <div className="relative z-10 flex flex-col justify-end w-full p-16">
                     <div className="space-y-8">
-                        <blockquote className="space-y-4">
-                            <p className="text-3xl font-serif font-medium text-white leading-relaxed">
-                                "This platform completely transformed how I approach learning. The AI tutor feels like having a personal mentor available 24/7."
-                            </p>
-                            <footer className="flex items-center gap-4">
-                                <img src="https://i.pravatar.cc/150?u=sarahconnor" alt="User" className="w-12 h-12 rounded-full border-2 border-white/20" />
-                                <div>
-                                    <div className="text-white font-bold">Sarah Connor</div>
-                                    <div className="text-white/60 text-sm">Full Stack Developer</div>
-                                </div>
-                            </footer>
-                        </blockquote>
+                        <div className="relative h-48">
+                            {testimonials.map((testimonial, index) => (
+                                <blockquote
+                                    key={index}
+                                    className={`absolute inset-0 space-y-4 transition-all duration-700 ease-in-out ${
+                                        index === currentTestimonial
+                                            ? 'opacity-100 translate-y-0'
+                                            : 'opacity-0 translate-y-4 pointer-events-none'
+                                    }`}
+                                >
+                                    <p className="text-2xl font-serif font-medium text-white leading-relaxed">
+                                        "{testimonial.quote}"
+                                    </p>
+                                    <footer className="flex items-center gap-4">
+                                        <img
+                                            src={`https://i.pravatar.cc/150?u=${testimonial.avatar}`}
+                                            alt={testimonial.name}
+                                            className="w-12 h-12 rounded-full border-2 border-white/20"
+                                        />
+                                        <div>
+                                            <div className="text-white font-bold">{testimonial.name}</div>
+                                            <div className="text-white/60 text-sm">{testimonial.role}</div>
+                                        </div>
+                                    </footer>
+                                </blockquote>
+                            ))}
+                        </div>
 
                         <div className="flex gap-2">
-                            <div className="w-2 h-2 rounded-full bg-white"></div>
-                            <div className="w-2 h-2 rounded-full bg-white/30"></div>
-                            <div className="w-2 h-2 rounded-full bg-white/30"></div>
+                            {testimonials.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentTestimonial(index)}
+                                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                        index === currentTestimonial ? 'bg-white w-6' : 'bg-white/30'
+                                    }`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -133,6 +177,11 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                         <PasswordResetView onBack={() => setMode('auth')} />
                     ) : (
                         <>
+                            {/* Logo in white section - visible */}
+                            <div className="flex justify-center lg:justify-start mb-6">
+                                <CogniSacraLogo className="w-28 h-28" />
+                            </div>
+
                             <div className="text-center lg:text-left">
                                 <h2 className="text-4xl font-bold text-gray-900 dark:text-white font-serif tracking-tight">
                                     {activeTab === 'signin' ? 'Welcome back' : 'Create an account'}

@@ -28,9 +28,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
         <div className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}>
             <div className="flex flex-col items-center">
                 {/* Large Logo Only */}
-                <div className="w-32 h-32 rounded-2xl overflow-hidden shadow-lg">
-                    <CogniSacraLogo className="w-full h-full" />
-                </div>
+                <CogniSacraLogo className="w-40 h-40" />
 
                 {/* F6S Logo */}
                 <a
