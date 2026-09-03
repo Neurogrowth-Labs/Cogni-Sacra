@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
-import GoogleIcon from '../icons/GoogleIcon';
-import AppleIcon from '../icons/AppleIcon';
-import LinkedInIcon from '../icons/LinkedInIcon';
 import EyeIcon from '../icons/EyeIcon';
 import EyeSlashIcon from '../icons/EyeSlashIcon';
 import PasswordResetView from './PasswordResetView';
@@ -12,16 +9,6 @@ interface SignInViewProps {
     onAuthenticated: (name: string) => void;
     onNavigateToSignUp: () => void;
 }
-
-const SocialButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void }> = ({ icon, label, onClick }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 group"
-    >
-        <span className="group-hover:scale-110 transition-transform duration-200">{icon}</span>
-    </button>
-);
 
 const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSignUp }) => {
     const [mode, setMode] = useState<'auth' | 'reset'>('auth');
@@ -68,11 +55,6 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
         }
     };
 
-    const handleSocialLogin = async (provider: 'google' | 'linkedin' | 'apple') => {
-        // Social login not implemented with backend yet
-        setErrorMsg(`${provider} login is not available yet. Please use email/password.`);
-    };
-
     return (
         <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 animate-fade-in">
             {/* Left Side - Artistic / Brand */}
@@ -83,11 +65,9 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
 
                 <div className="relative z-10 flex flex-col justify-between w-full p-16">
                     <div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 backdrop-blur-md border border-white/10">
-                                <CogniSacraLogo className="w-full h-full" />
-                            </div>
-                            <span className="text-2xl font-bold text-white font-serif tracking-tight">CogniSacra Academy</span>
+                        {/* Large Logo Only */}
+                        <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+                            <CogniSacraLogo className="w-full h-full" />
                         </div>
                     </div>
 
@@ -116,7 +96,7 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
 
             {/* Right Side - Form */}
             <div className="w-full lg:w-1/2 flex justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900 overflow-y-auto">
-                <div className="w-full max-w-md space-y-10 my-auto">
+                <div className="w-full max-w-md space-y-8 my-auto">
                     {mode === 'reset' ? (
                         <PasswordResetView onBack={() => setMode('auth')} />
                     ) : (
@@ -128,34 +108,6 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
                                 <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
                                     Enter your details to access your account.
                                 </p>
-                            </div>
-
-                            {/* Social Auth */}
-                            <div className="grid grid-cols-3 gap-4">
-                                <SocialButton icon={<GoogleIcon />} label="Google" onClick={() => handleSocialLogin('google')} />
-                                <SocialButton icon={<AppleIcon className="text-gray-900 dark:text-white" />} label="Apple" onClick={() => handleSocialLogin('apple')} />
-                                <SocialButton icon={<LinkedInIcon />} label="LinkedIn" onClick={() => handleSocialLogin('linkedin')} />
-                            </div>
-
-                            {/* F6S Logo */}
-                            <div className="flex justify-center">
-                                <a
-                                    href="https://www.f6s.com/cognisacra"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:opacity-80 transition-opacity"
-                                >
-                                    <img src="/f6s.jpeg" alt="F6S" className="h-6 w-auto object-contain" />
-                                </a>
-                            </div>
-
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
-                                </div>
-                                <div className="relative flex justify-center text-sm">
-                                    <span className="px-4 bg-white dark:bg-gray-900 text-gray-500">Or continue with email</span>
-                                </div>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-6">
@@ -242,6 +194,18 @@ const SignInView: React.FC<SignInViewProps> = ({ onAuthenticated, onNavigateToSi
                                     Sign up
                                 </button>
                             </p>
+
+                            {/* F6S Badge at bottom */}
+                            <div className="flex justify-center pt-4">
+                                <a
+                                    href="https://www.f6s.com/cognisacra"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <img src="/f6s.jpeg" alt="F6S" className="h-8 w-auto object-contain" />
+                                </a>
+                            </div>
                         </>
                     )}
                 </div>

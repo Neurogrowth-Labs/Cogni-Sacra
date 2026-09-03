@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import CogniSacraLogo from '../icons/IntelliLearnLogo';
-import GoogleIcon from '../icons/GoogleIcon';
-import AppleIcon from '../icons/AppleIcon';
-import LinkedInIcon from '../icons/LinkedInIcon';
 import EyeIcon from '../icons/EyeIcon';
 import EyeSlashIcon from '../icons/EyeSlashIcon';
 import CheckCircleIcon from '../icons/CheckCircleIcon';
@@ -16,16 +13,6 @@ interface LoginViewProps {
 
 type AuthTab = 'signin' | 'signup';
 type AuthMode = 'auth' | 'reset';
-
-const SocialButton: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void }> = ({ icon, label, onClick }) => (
-    <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-center py-3 px-4 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 group"
-    >
-        <span className="group-hover:scale-110 transition-transform duration-200">{icon}</span>
-    </button>
-);
 
 const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
     const navigate = useNavigate();
@@ -100,31 +87,19 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
         }
     };
 
-    const handleSocialLogin = async (provider: 'google' | 'linkedin' | 'apple') => {
-        if (provider !== 'google') {
-            setErrorMsg(`${provider} login is not yet supported. Please use Google or email.`);
-            return;
-        }
-        // Google login requires a Google ID token from Google Sign-In SDK
-        // This will be handled by the Google Sign-In button integration
-        setErrorMsg('Google Sign-In integration coming soon. Please use email login.');
-    };
-
     return (
-        <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 animate-fade-in overflow-hidden">
+        <div className="flex min-h-screen w-full bg-white dark:bg-gray-900 animate-fade-in">
             {/* Left Side - Artistic / Brand */}
             <div className="hidden lg:flex w-1/2 relative bg-gray-900 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
                 <div className="absolute inset-0 bg-gradient-to-tr from-crimson/40 to-blue-900/40"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                
+
                 <div className="relative z-10 flex flex-col justify-between w-full p-16">
                     <div>
-                        <div className="flex items-center gap-3">
-                            <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/10">
-                                <CogniSacraLogo className="w-8 h-8" />
-                            </div>
-                            <span className="text-2xl font-bold text-white font-serif tracking-tight">CogniSacra Academy</span>
+                        {/* Large Logo Only - No text */}
+                        <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg">
+                            <CogniSacraLogo className="w-full h-full" />
                         </div>
                     </div>
 
@@ -141,7 +116,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
                                 </div>
                             </footer>
                         </blockquote>
-                        
+
                         <div className="flex gap-2">
                             <div className="w-2 h-2 rounded-full bg-white"></div>
                             <div className="w-2 h-2 rounded-full bg-white/30"></div>
@@ -152,152 +127,148 @@ const LoginView: React.FC<LoginViewProps> = ({ onAuthenticated }) => {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900">
-                <div className="w-full max-w-md space-y-10">
+            <div className="w-full lg:w-1/2 flex justify-center p-8 sm:p-12 lg:p-24 bg-white dark:bg-gray-900 overflow-y-auto">
+                <div className="w-full max-w-md space-y-8 my-auto">
                     {mode === 'reset' ? (
                         <PasswordResetView onBack={() => setMode('auth')} />
                     ) : (
                         <>
-                    <div className="text-center lg:text-left">
-                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white font-serif tracking-tight">
-                            {activeTab === 'signin' ? 'Welcome back' : 'Create an account'}
-                        </h2>
-                        <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
-                            {activeTab === 'signin' ? 'Enter your details to access your account.' : 'Start your 30-day free trial. Cancel anytime.'}
-                        </p>
-                    </div>
-
-                    {/* Social Auth */}
-                    <div className="grid grid-cols-3 gap-4">
-                        <SocialButton icon={<GoogleIcon />} label="Google" onClick={() => handleSocialLogin('google')} />
-                        <SocialButton icon={<AppleIcon className="text-gray-900 dark:text-white" />} label="Apple" onClick={() => handleSocialLogin('apple')} />
-                        <SocialButton icon={<LinkedInIcon />} label="LinkedIn" onClick={() => handleSocialLogin('linkedin')} />
-                    </div>
-
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-white dark:bg-gray-900 text-gray-500">Or continue with email</span>
-                        </div>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {errorMsg && (
-                            <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
-                                {errorMsg}
+                            <div className="text-center lg:text-left">
+                                <h2 className="text-4xl font-bold text-gray-900 dark:text-white font-serif tracking-tight">
+                                    {activeTab === 'signin' ? 'Welcome back' : 'Create an account'}
+                                </h2>
+                                <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
+                                    {activeTab === 'signin' ? 'Enter your details to access your account.' : 'Start your 30-day free trial. Cancel anytime.'}
+                                </p>
                             </div>
-                        )}
-                        {verificationMsg && (
-                            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
-                                {verificationMsg}
-                            </div>
-                        )}
 
-                        {activeTab === 'signup' && (
-                            <div className="space-y-1.5">
-                                <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Full Name</label>
-                                <input
-                                    id="fullname"
-                                    type="text"
-                                    required
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
-                                    placeholder="e.g. Alex Turner"
-                                />
-                            </div>
-                        )}
-                        
-                        <div className="space-y-1.5">
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Email</label>
-                            <input
-                                id="email"
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
-                                placeholder="e.g. alex@example.com"
-                            />
-                        </div>
-                        
-                        <div className="space-y-6">
-                            <div className="space-y-1.5">
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Password</label>
-                                <div className="relative group">
-                                    <input
-                                        id="password"
-                                        type={isVisible ? 'text' : 'password'}
-                                        required
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
-                                        placeholder="••••••••"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsVisible(!isVisible)}
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                                    >
-                                        {isVisible ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
-                                    </button>
-                                </div>
-                            </div>
-                            {activeTab === 'signup' && (
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                        <CheckCircleIcon className="w-4 h-4 text-green-500" /> Must be at least 6 characters
+                            <form onSubmit={handleSubmit} className="space-y-6">
+                                {errorMsg && (
+                                    <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
+                                        {errorMsg}
                                     </div>
+                                )}
+                                {verificationMsg && (
+                                    <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm">
+                                        {verificationMsg}
+                                    </div>
+                                )}
+
+                                {activeTab === 'signup' && (
+                                    <div className="space-y-1.5">
+                                        <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Full Name</label>
+                                        <input
+                                            id="fullname"
+                                            type="text"
+                                            required
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
+                                            placeholder="e.g. Alex Turner"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="space-y-1.5">
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Email</label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
+                                        placeholder="e.g. alex@example.com"
+                                    />
                                 </div>
-                            )}
-                        </div>
 
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4 h-4 rounded border-gray-300 text-crimson focus:ring-crimson"
-                                />
-                                Remember me
-                            </label>
-                            {activeTab === 'signin' && (
-                                <Link
-                                    to="/forgot-password"
-                                    onClick={() => setMode('reset')}
-                                    className="text-sm font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                <div className="space-y-6">
+                                    <div className="space-y-1.5">
+                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Password</label>
+                                        <div className="relative group">
+                                            <input
+                                                id="password"
+                                                type={isVisible ? 'text' : 'password'}
+                                                required
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="block w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-crimson/20 focus:border-crimson transition-all duration-200"
+                                                placeholder="••••••••"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsVisible(!isVisible)}
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                            >
+                                                {isVisible ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {activeTab === 'signup' && (
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                <CheckCircleIcon className="w-4 h-4 text-green-500" /> Must be at least 6 characters
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={rememberMe}
+                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                            className="w-4 h-4 rounded border-gray-300 text-crimson focus:ring-crimson"
+                                        />
+                                        Remember me
+                                    </label>
+                                    {activeTab === 'signin' && (
+                                        <Link
+                                            to="/forgot-password"
+                                            onClick={() => setMode('reset')}
+                                            className="text-sm font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-crimson hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crimson transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:bg-gray-400 disabled:cursor-not-allowed"
                                 >
-                                    Forgot password?
+                                    {isLoading ? 'Processing...' : (activeTab === 'signin' ? 'Sign in' : 'Create account')}
+                                </button>
+                            </form>
+
+                            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+                                {activeTab === 'signin' ? "Don't have an account? " : "Already have an account? "}
+                                <Link
+                                    to={activeTab === 'signin' ? '/register' : '/signin'}
+                                    onClick={() => {
+                                        setActiveTab(activeTab === 'signin' ? 'signup' : 'signin');
+                                        setErrorMsg(null);
+                                        setVerificationMsg(null);
+                                    }}
+                                    className="font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
+                                >
+                                    {activeTab === 'signin' ? 'Sign up' : 'Log in'}
                                 </Link>
-                            )}
-                        </div>
+                            </p>
 
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-crimson hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crimson transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? 'Processing...' : (activeTab === 'signin' ? 'Sign in' : 'Create account')}
-                        </button>
-                    </form>
-
-                    <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-                        {activeTab === 'signin' ? "Don't have an account? " : "Already have an account? "}
-                        <Link
-                            to={activeTab === 'signin' ? '/register' : '/signin'}
-                            onClick={() => {
-                                setActiveTab(activeTab === 'signin' ? 'signup' : 'signin');
-                                setErrorMsg(null);
-                                setVerificationMsg(null);
-                            }}
-                            className="font-bold text-crimson hover:text-red-700 dark:hover:text-red-400 transition-colors"
-                        >
-                            {activeTab === 'signin' ? 'Sign up' : 'Log in'}
-                        </Link>
-                    </p>
+                            {/* F6S Badge at bottom */}
+                            <div className="flex justify-center pt-4">
+                                <a
+                                    href="https://www.f6s.com/cognisacra"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:opacity-80 transition-opacity"
+                                >
+                                    <img src="/f6s.jpeg" alt="F6S" className="h-8 w-auto object-contain" />
+                                </a>
+                            </div>
                         </>
                     )}
                 </div>
